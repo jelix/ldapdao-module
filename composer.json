@@ -1,0 +1,27 @@
+{
+    "name": "jelix/ldapdao-module",
+    "type": "jelix-module",
+    "description": "module for Jelix,allowing to authenticate with an ldap server and to register users locally.",
+    "keywords": ["ldap", "dao", "jelix"],
+    "homepage": "http://jelix.org",
+    "license": "LGPL-2.1",
+    "authors": [
+        {
+            "name": "Laurent Jouanneau",
+            "email": "laurent@jelix.org"
+        }
+    ],
+    "require": {
+    },
+    "minimum-stability": "stable",
+    "extra" : {
+        "jelix" : {
+            "modules": [
+                "ldapdao"
+            ]
+        },
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}
