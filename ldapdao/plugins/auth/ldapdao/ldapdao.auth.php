@@ -14,7 +14,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
     * default user attributes list
     * @var array
     */
-    protected $_default_attributes = array("cn"=>"lastename",
+    protected $_default_attributes = array("cn"=>"lastname",
                                            "name"=>"firstname");
 
     function __construct($params){
@@ -123,7 +123,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         $user = jDao::createRecord($this->_params['dao'], $this->_params['profile']);
         $user->login = $login;
         // should not be empty because of a jauth listener that prevent
-        // user not having passord to login.
+        // user not having password to login.
         $user->password = 'no password'; 
         return $user;
     }
