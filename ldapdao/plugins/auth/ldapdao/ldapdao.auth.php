@@ -74,6 +74,9 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         if (!isset($this->_params['bindUserDN']) || $this->_params['bindUserDN'] == '') {
             throw new jException('ldapdao~errors.bindUserDN.missing');
         }
+        if (!is_array($this->_params['bindUserDN'])) {
+            $this->_params['bindUserDN'] = array($this->_params['bindUserDN']);
+        }
     }
 
     public function saveNewUser($user){
@@ -165,15 +168,23 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
             return false;
         }
 
-        //authenticate user
-        $bind = ldap_bind($connect, $this->_buildUserDn($login), $password);
+        $bind = null;
 
-        if (!$bind) {
-            jLog::log('ldapdao: bind failed with '.$this->_buildUserDn($login), 'auth');
-            ldap_close($connect);
-            return false;
+        //authenticate user; let's try will all configured DN
+        foreach($this->_params['bindUserDN'] as $dn) {
+            $realDn = str_replace('%%USERNAME%%', $login, $dn);
+            $bind = @ldap_bind($connect, $realDn, $password);
+            if ($bind) {
+                break;
+            }
         }
         ldap_close($connect);
+
+        if (!$bind) {
+            jLog::log('ldapdao: cannot bind to any configured path with the login '.$login, 'auth');
+            return false;
+        }
+
         $connect = $this->_bindLdapAdminUser();
 
         // check if he is in our database
@@ -222,14 +233,6 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         }
         return $user;
     }
-
-    protected function _buildUserDn($login) {
-        if ($login) {
-            return str_replace('%%USERNAME%%', $login, $this->_params['bindUserDN']);
-        }
-        return '';
-    }
-
 
     protected function searchLdapUserAttributes($connect, $login, $user) {
         $filter = str_replace('%%USERNAME%%', $login, $this->_params['searchUserFilter']);

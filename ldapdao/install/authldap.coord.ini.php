@@ -123,7 +123,9 @@ ldapAdminPassword="a_password"
 ;   sort the users list
 uidProperty=uid
 
-; the dn to bind the user to login
+; the dn to bind the user to login. It can be a list of DN:
+;bindUserDN[]= ...
+;bindUserDN[]= ...
 bindUserDN="uid=%%USERNAME%%,ou=users,dc=XY,dc=fr"
 
 ; search base dn, example for Active Directory: "ou=ADAM users,o=Microsoft,c=US"
