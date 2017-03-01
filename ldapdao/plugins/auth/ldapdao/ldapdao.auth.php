@@ -32,9 +32,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
             'ldapAdminUserDn'      =>  null,
             'ldapAdminPassword'      =>  null,
             'protocolVersion'   =>  3,
-            'uidProperty'       =>  'cn',
-            'searchUserListReturnsUser' => 1,
-            'searchUserListUserUidAttribute' => ''
+            'searchBaseDN' => ''
         );
 
         // iterate each default parameter and apply it to actual params if missing in $params.
@@ -44,12 +42,8 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
             }
         }
 
-        if (!isset($this->_params['searchBaseDN']) || $this->_params['searchBaseDN'] == '') {
+        if ($this->_params['searchBaseDN'] == '') {
             throw new jException('ldapdao~errors.search.base.missing');
-        }
-
-        if (!isset($this->_params['searchUserListFilter']) || $this->_params['searchUserListFilter'] == '') {
-            throw new jException('ldapdao~errors.search.filter.missing');
         }
 
         if (!isset($this->_params['searchAttributes']) || $this->_params['searchAttributes'] == '') {
@@ -170,7 +164,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
 
         $bind = null;
 
-        //authenticate user; let's try will all configured DN
+        //authenticate user; let's try with all configured DN
         foreach($this->_params['bindUserDN'] as $dn) {
             $realDn = str_replace('%%USERNAME%%', $login, $dn);
             $bind = @ldap_bind($connect, $realDn, $password);
@@ -330,7 +324,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
     /**
      * open the connection to the ldap server
      * and bind to the admin user
-     * @return resource the ldap connection
+     * @return resource|false the ldap connection
      */
     protected function _bindLdapAdminUser() {
         $connect = $this->_getLinkId();

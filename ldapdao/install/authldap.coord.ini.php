@@ -119,11 +119,6 @@ ldapAdminUserDn="uid=MYUID,ou=users,dc=XY,dc=fr"
 ; password used to connect with LDAP
 ldapAdminPassword="a_password"
 
-; used to:
-;   build search filter for a user (getUser() or verifyPassword())
-;   build search filter for users list
-;   sort the users list
-uidProperty=uid
 
 ; the dn to bind the user to login. It can be a list of DN:
 ;bindUserDN[]= ...
@@ -146,18 +141,10 @@ searchBaseDN="dc=XY,dc=fr"
 searchUserFilter="(&(objectClass=posixAccount)(uid=%%USERNAME%%))"
 
 
-; users list search filter
-; example for Active Directory: "(objectClass=user)"
-searchUserListFilter = "(&(objectClass=posixGroup)(cn=XYZ*))"
-
-; indicate if the filter returns user attribute (1) or should we to query user info separatly (0)
-searchUserListReturnsUser = 0
-; when searchUserListReturnsUser = 0, indicate the attribute containing the user id allowing to
-; get user info.
-searchUserListUserUidAttribute = memberUid
-
 ; attributes to retrieve for a user
 ; for dao mapping: "ldap attribute:dao attribute"
+; ex: "uid:login,givenName:firstname,mail:email" : uid goes into the login property,
+; ldap attribute givenName goes to the property firstname etc..
 ; example for Active Directory: "cn,distinguishedName,name"
 ; or "sAMAccountName:login,givenName:firstname,sn:lastname,mail:email,distinguishedName,name,dn"
 searchAttributes="uid:login,givenName:firstname,sn:lastname,mail:email"
