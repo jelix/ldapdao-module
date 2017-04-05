@@ -119,6 +119,9 @@ ldapAdminUserDn="uid=MYUID,ou=users,dc=XY,dc=fr"
 ; password used to connect with LDAP
 ldapAdminPassword="a_password"
 
+; this is the jelix user that have admin rights. It will not be verified in the
+; ldap
+jelixAdminLogin="admin"
 
 ; the dn to bind the user to login. It can be a list of DN:
 ;bindUserDN[]= ...
@@ -133,7 +136,8 @@ bindUserDN="uid=%%LOGIN%%,ou=users,dc=XY,dc=fr"
 ;bindUserDnProperty = "dn"
 bindUserDnProperty = ""
 
-; search base dn, example for Active Directory: "ou=ADAM users,o=Microsoft,c=US", or "OU=Town,DC=my-town,DC=com"
+; search base dn. Used to search a user using the filter from searchUserFilter
+; example for Active Directory: "ou=ADAM users,o=Microsoft,c=US", or "OU=Town,DC=my-town,DC=com"
 searchBaseDN="dc=XY,dc=fr"
 
 ; filter to get user information, with the given login name

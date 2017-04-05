@@ -137,26 +137,11 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         $dao = jDao::get($this->_params['dao'], $this->_params['profile']);
         $user = $dao->getByLogin($login);
 
-        if ($login == 'admin') {
-            if (!$user) {
-                return false;
-            }
-
-            $result = $this->checkPassword($password, $user->password);
-
-            if ($result === false)
-                return false;
-
-            if ($result !== true) {
-                // it is a new hash for the password, let's update it persistently
-                $user->password = $result;
-                $dao->updatePassword($login, $result);
-            }
-            return $user;
+        if ($login == $this->_params['jelixAdminLogin']) {
+            return $this->checkAdminLogin($user, $dao, $password);
         }
 
         $connect = $this->_getLinkId();
-
         if (!$connect) {
             jLog::log('ldapdao: impossible to connect to ldap', 'auth');
             return false;
@@ -265,6 +250,25 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
             }
         }
         return false;
+    }
+
+    protected function checkAdminLogin($user, $dao, $password) {
+        if (!$user) {
+            return false;
+        }
+
+        $result = $this->checkPassword($password, $user->password);
+
+        if ($result === false)
+            return false;
+
+        if ($result !== true) {
+            // it is a new hash for the password, let's update it persistently
+            $user->password = $result;
+            $dao->updatePassword($this->_params['jelixAdminLogin'], $result);
+        }
+        return $user;
+
     }
 
     protected function readLdapAttributes($attributes, $user) {
