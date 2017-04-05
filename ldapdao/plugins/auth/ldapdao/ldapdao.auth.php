@@ -166,7 +166,9 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
 
         //authenticate user; let's try with all configured DN
         foreach($this->_params['bindUserDN'] as $dn) {
-            $realDn = str_replace('%%USERNAME%%', $login, $dn);
+            $realDn = str_replace(array('%%LOGIN%%',
+                                        '%%USERNAME%%'), // USERNAME deprecated
+                                  $login, $dn);
             $bind = @ldap_bind($connect, $realDn, $password);
             if ($bind) {
                 break;
@@ -250,7 +252,10 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
     }
 
     protected function searchLdapUserAttributes($connect, $login, $user) {
-        $filter = str_replace('%%USERNAME%%', $login, $this->_params['searchUserFilter']);
+        $filter = str_replace(array('%%LOGIN%%', '%%USERNAME%%'), // USERNAME deprecated
+                              $login,
+                              $this->_params['searchUserFilter']);
+
         if (($search = ldap_search($connect,
                                    $this->_params['searchBaseDN'],
                                    $filter,
@@ -291,7 +296,9 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         if ($this->_params['searchGroupFilter'] == '') {
             return false;
         }
-        $filter = str_replace('%%USERNAME%%', $login, $this->_params['searchGroupFilter']);
+        $filter = str_replace(array('%%LOGIN%%', '%%USERNAME%%'), // USERNAME deprecated
+                              $login,
+                              $this->_params['searchGroupFilter']);
         $grpProp = $this->_params['searchGroupProperty'];
 
         if (($search = ldap_search($connect,

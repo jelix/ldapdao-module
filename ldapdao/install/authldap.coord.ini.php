@@ -123,7 +123,7 @@ ldapAdminPassword="a_password"
 ; the dn to bind the user to login. It can be a list of DN:
 ;bindUserDN[]= ...
 ;bindUserDN[]= ...
-bindUserDN="uid=%%USERNAME%%,ou=users,dc=XY,dc=fr"
+bindUserDN="uid=%%LOGIN%%,ou=users,dc=XY,dc=fr"
 ; Some LDAP server like Active Directory cannot use this but need a full DN specific for each user
 ; in this case use the next bindUserDnProperty variable
 
@@ -136,9 +136,9 @@ bindUserDnProperty = ""
 ; search base dn, example for Active Directory: "ou=ADAM users,o=Microsoft,c=US", or "OU=Town,DC=my-town,DC=com"
 searchBaseDN="dc=XY,dc=fr"
 
-; filter to get user information
-; example for Active Directory: "(sAMAccountName=%%USERNAME%%)"
-searchUserFilter="(&(objectClass=posixAccount)(uid=%%USERNAME%%))"
+; filter to get user information, with the given login name
+; example for Active Directory: "(sAMAccountName=%%LOGIN%%)"
+searchUserFilter="(&(objectClass=posixAccount)(uid=%%LOGIN%%))"
 
 
 ; attributes to retrieve for a user
@@ -151,8 +151,8 @@ searchAttributes="uid:login,givenName:firstname,sn:lastname,mail:email"
 
 ; attributes to retrieve the group of a user for jAcl2. leave empty if you don't use it
 ; !!! IMPORTANT !!! : if searchGroupFilter is not empty,
-; Lizmap will remove the user from all Lizmap groups
+; the plugin will remove the user from all existing jelix groups
 ; and only keep the relation between the user and the group retrieved from LDAP
-;searchGroupFilter="(&(objectClass=posixGroup)(cn=XYZ*)(memberUid=%%USERNAME%%))"
+;searchGroupFilter="(&(objectClass=posixGroup)(cn=XYZ*)(memberUid=%%LOGIN%%))"
 searchGroupFilter=
 searchGroupProperty="cn"
