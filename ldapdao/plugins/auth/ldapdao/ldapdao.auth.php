@@ -180,6 +180,25 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         }
         ldap_close($connect);
 
+        // First pass with direct login has not worked
+        // Connect as admin, to get more information on the user
+        // This is necessary in ActiveDirectory to get the user by full DN
+        if(!$bind and $this->_params['bindUserDnProperty'] != ''){
+            $aconnect = $this->_bindLdapAdminUser();
+            $dnProp = $this->_params['bindUserDnProperty'];
+
+            // Create user instance, but do not insert it into database
+            $user = $this->createUserObject($login, '');
+
+            //get ldap user infos: name, email etc...
+            if($checkUser = $this->searchLdapUserAttributes($aconnect, $login, $user)){
+                $connect = $this->_getLinkId();
+                $bind = @ldap_bind($connect, $user->$dnProp, $password);
+                ldap_close($connect);
+            }
+            ldap_close($aconnect);
+        }
+
         if (!$bind) {
             jLog::log('ldapdao: cannot bind to any configured path with the login '.$login, 'auth');
             return false;
@@ -206,7 +225,9 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         ldap_close($connect);
 
         if ($userGroup === false) {
-            // no group given by ldap, let's use defaults groups
+            // no group filter given by ldap, let's use Lizmap groups:
+            // default group if it's new user or Lizmap groups if the user already exists
+            // and do not sync LDAP and lizmap, which would lead to keep only the LDAP group
             return $user;
         }
 
@@ -271,11 +292,14 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
     }
 
     protected function searchUserGroup($connect, $login) {
+        // Do not search for groups if no group filter passed
+        // Usefull to forbid Lizmap to sync groups from LDAP and loose all related groups for the user
         if ($this->_params['searchGroupFilter'] == '') {
             return false;
         }
         $filter = str_replace('%%USERNAME%%', $login, $this->_params['searchGroupFilter']);
         $grpProp = $this->_params['searchGroupProperty'];
+
         if (($search = ldap_search($connect,
                                    $this->_params['searchBaseDN'],
                                    $filter,
@@ -283,6 +307,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
             if (($entry = ldap_first_entry($connect, $search))) {
                 $attributes = ldap_get_attributes($connect, $entry);
                 if (isset($attributes[$grpProp]) && $attributes[$grpProp]['count'] > 0 ) {
+
                     return $attributes[$grpProp][0];
                 }
             }

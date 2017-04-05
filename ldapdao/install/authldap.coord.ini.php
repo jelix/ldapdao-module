@@ -113,7 +113,9 @@ port=389
 ;port=636 ; tls port
 
 ; dn of the user to connect with LDAP (user who has right to list user and see their attributes)
+; other example: ldapAdminUserDn="CN=SOMELDAPUSER,OU=Some group,OU=Some other group,DC=my-city,DC=com"
 ldapAdminUserDn="uid=MYUID,ou=users,dc=XY,dc=fr"
+
 ; password used to connect with LDAP
 ldapAdminPassword="a_password"
 
@@ -127,15 +129,25 @@ uidProperty=uid
 ;bindUserDN[]= ...
 ;bindUserDN[]= ...
 bindUserDN="uid=%%USERNAME%%,ou=users,dc=XY,dc=fr"
+; Some LDAP server like Active Directory cannot use this but need a full DN specific for each user
+; in this case use the next bindUserDnProperty variable
 
-; search base dn, example for Active Directory: "ou=ADAM users,o=Microsoft,c=US"
+; the property containing the full user DN. It is needed e.g. for Active Directory
+; because the user must use its full unique DN to login
+; leave empty to only use the above DN configured with bindUserDN
+;bindUserDnProperty = "dn"
+bindUserDnProperty = ""
+
+; search base dn, example for Active Directory: "ou=ADAM users,o=Microsoft,c=US", or "OU=Town,DC=my-town,DC=com"
 searchBaseDN="dc=XY,dc=fr"
 
 ; filter to get user information
+; example for Active Directory: "(sAMAccountName=%%USERNAME%%)"
 searchUserFilter="(&(objectClass=posixAccount)(uid=%%USERNAME%%))"
 
 
-; users list search filter, example for Active Directory: "(objectClass=user)"
+; users list search filter
+; example for Active Directory: "(objectClass=user)"
 searchUserListFilter = "(&(objectClass=posixGroup)(cn=XYZ*))"
 
 ; indicate if the filter returns user attribute (1) or should we to query user info separatly (0)
@@ -144,11 +156,16 @@ searchUserListReturnsUser = 0
 ; get user info.
 searchUserListUserUidAttribute = memberUid
 
-; attributes to retrieve for a user, example for Active Directory: "cn,distinguishedName,name"
+; attributes to retrieve for a user
 ; for dao mapping: "ldap attribute:dao attribute"
+; example for Active Directory: "cn,distinguishedName,name"
+; or "sAMAccountName:login,givenName:firstname,sn:lastname,mail:email,distinguishedName,name,dn"
 searchAttributes="uid:login,givenName:firstname,sn:lastname,mail:email"
 
 ; attributes to retrieve the group of a user for jAcl2. leave empty if you don't use it
+; !!! IMPORTANT !!! : if searchGroupFilter is not empty,
+; Lizmap will remove the user from all Lizmap groups
+; and only keep the relation between the user and the group retrieved from LDAP
 ;searchGroupFilter="(&(objectClass=posixGroup)(cn=XYZ*)(memberUid=%%USERNAME%%))"
 searchGroupFilter=
 searchGroupProperty="cn"
