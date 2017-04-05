@@ -144,7 +144,6 @@ searchBaseDN="dc=XY,dc=fr"
 ; example for Active Directory: "(sAMAccountName=%%LOGIN%%)"
 searchUserFilter="(&(objectClass=posixAccount)(uid=%%LOGIN%%))"
 
-
 ; attributes to retrieve for a user
 ; for dao mapping: "ldap attribute:dao attribute"
 ; ex: "uid:login,givenName:firstname,mail:email" : uid goes into the login property,
@@ -153,10 +152,16 @@ searchUserFilter="(&(objectClass=posixAccount)(uid=%%LOGIN%%))"
 ; or "sAMAccountName:login,givenName:firstname,sn:lastname,mail:email,distinguishedName,name,dn"
 searchAttributes="uid:login,givenName:firstname,sn:lastname,mail:email"
 
-; attributes to retrieve the group of a user for jAcl2. leave empty if you don't use it
+; search ldap filter to retrieve groups of a user.
+; The user will be assign to jAcl2 groups having the same name of ldap groups.
+; Leave empty if you don't want this synchronisation between jAcl2 groups and
+; ldap groups.
 ; !!! IMPORTANT !!! : if searchGroupFilter is not empty,
 ; the plugin will remove the user from all existing jelix groups
 ; and only keep the relation between the user and the group retrieved from LDAP
 ;searchGroupFilter="(&(objectClass=posixGroup)(cn=XYZ*)(memberUid=%%LOGIN%%))"
 searchGroupFilter=
+
+; the property in the ldap entry corresponding to a group, that indicate the
+; the group name
 searchGroupProperty="cn"

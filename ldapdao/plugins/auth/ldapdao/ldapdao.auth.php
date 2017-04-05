@@ -133,7 +133,8 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         throw new jException('ldapdao~errors.unsupported.password.change');
     }
 
-    public function verifyPassword($login, $password) {
+    public function verifyPassword($login, $password)
+    {
         $dao = jDao::get($this->_params['dao'], $this->_params['profile']);
         $user = $dao->getByLogin($login);
 
@@ -150,10 +151,10 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         $bind = null;
 
         //authenticate user; let's try with all configured DN
-        foreach($this->_params['bindUserDN'] as $dn) {
-            $realDn = str_replace(array('%%LOGIN%%',
-                                        '%%USERNAME%%'), // USERNAME deprecated
-                                  $login, $dn);
+        foreach ($this->_params['bindUserDN'] as $dn) {
+            $realDn = str_replace(
+                array('%%LOGIN%%', '%%USERNAME%%'), // USERNAME deprecated
+                $login, $dn);
             $bind = @ldap_bind($connect, $realDn, $password);
             if ($bind) {
                 break;
@@ -164,7 +165,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         // First pass with direct login has not worked
         // Connect as admin, to get more information on the user
         // This is necessary in ActiveDirectory to get the user by full DN
-        if(!$bind and $this->_params['bindUserDnProperty'] != ''){
+        if (!$bind && $this->_params['bindUserDnProperty'] != '') {
             $aconnect = $this->_bindLdapAdminUser();
             $dnProp = $this->_params['bindUserDnProperty'];
 
@@ -172,7 +173,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
             $user = $this->createUserObject($login, '');
 
             //get ldap user infos: name, email etc...
-            if($checkUser = $this->searchLdapUserAttributes($aconnect, $login, $user)){
+            if ($checkUser = $this->searchLdapUserAttributes($aconnect, $login, $user)) {
                 $connect = $this->_getLinkId();
                 $bind = @ldap_bind($connect, $user->$dnProp, $password);
                 ldap_close($connect);
@@ -181,7 +182,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         }
 
         if (!$bind) {
-            jLog::log('ldapdao: cannot bind to any configured path with the login '.$login, 'auth');
+            jLog::log('ldapdao: cannot bind to any configured path with the login ' . $login, 'auth');
             return false;
         }
 
@@ -196,30 +197,32 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
             //get ldap user infos: name, email etc...
             $this->searchLdapUserAttributes($connect, $login, $user);
             $dao->insert($user);
-            jEvent::notify ('AuthNewUser', array('user'=>$user));
+            jEvent::notify('AuthNewUser', array('user' => $user));
         }
 
         // retrieve the user group (if relevant)
-        $userGroup = $this->searchUserGroup($connect, $login);
+        $userGroups = $this->searchUserGroups($connect, $login);
         ldap_close($connect);
-
-        if ($userGroup === false) {
-            // no group filter given by ldap, let's use Lizmap groups:
-            // default group if it's new user or Lizmap groups if the user already exists
-            // and do not sync LDAP and lizmap, which would lead to keep only the LDAP group
-            return $user;
+        if ($userGroups !== false) {
+            // the user is at least in a ldap group, so we synchronize ldap groups
+            // with jAcl2 groups
+            $this->synchronizeAclGroups($login, $userGroups);
         }
+        return $user;
+    }
 
+    protected function synchronizeAclGroups($login, $userGroups) {
         // we know the user group: we should be sure it is the same in jAcl2
         $gplist = jDao::get('jacl2db~jacl2groupsofuser', 'jacl2_profile')
                         ->getGroupsUser($login);
         $groupsToRemove = array();
-        $hasRightGroup = false;
         foreach($gplist as $group) {
-            if ($group->grouptype == 2 ) // private group
+            if ($group->grouptype == 2 ) { // private group
                 continue;
-            if ($group->name === $userGroup) {
-                $hasRightGroup = true;
+            }
+            $idx = array_search($group->name, $userGroups);
+            if ($idx !== false) {
+                unset($userGroups[$idx]);
             }
             else {
                 $groupsToRemove[] = $group->name;
@@ -228,10 +231,11 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         foreach($groupsToRemove as $group) {
             jAcl2DbUserGroup::removeUserFromGroup($login, $group);
         }
-        if(!$hasRightGroup && jAcl2DbUserGroup::getGroup($userGroup)) {
-            jAcl2DbUserGroup::addUserToGroup($login, $userGroup);
+        foreach($userGroups as $newGroup) {
+            if (jAcl2DbUserGroup::getGroup($newGroup)) {
+                jAcl2DbUserGroup::addUserToGroup($login, $newGroup);
+            }
         }
-        return $user;
     }
 
     protected function searchLdapUserAttributes($connect, $login, $user) {
@@ -292,9 +296,9 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         return $user;
     }
 
-    protected function searchUserGroup($connect, $login) {
+    protected function searchUserGroups($connect, $login) {
         // Do not search for groups if no group filter passed
-        // Usefull to forbid Lizmap to sync groups from LDAP and loose all related groups for the user
+        // Usefull to forbid the driver to sync groups from LDAP and loose all related groups for the user
         if ($this->_params['searchGroupFilter'] == '') {
             return false;
         }
@@ -303,19 +307,20 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
                               $this->_params['searchGroupFilter']);
         $grpProp = $this->_params['searchGroupProperty'];
 
+        $groups = array();
         if (($search = ldap_search($connect,
                                    $this->_params['searchBaseDN'],
                                    $filter,
                                    array($grpProp)))) {
-            if (($entry = ldap_first_entry($connect, $search))) {
+            $entry = ldap_first_entry($connect, $search);
+            do {
                 $attributes = ldap_get_attributes($connect, $entry);
                 if (isset($attributes[$grpProp]) && $attributes[$grpProp]['count'] > 0 ) {
-
-                    return $attributes[$grpProp][0];
+                    $groups[] = $attributes[$grpProp][0];
                 }
-            }
+            } while ($entry = ldap_next_entry($connect, $entry));
         }
-        return false;
+        return $groups;
     }
 
     /**
