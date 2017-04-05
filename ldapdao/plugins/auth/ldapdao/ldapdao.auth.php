@@ -203,8 +203,6 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         $connect = $this->_bindLdapAdminUser();
 
         // check if he is in our database
-        $dao = jDao::get($this->_params['dao'], $this->_params['profile']);
-        $user = $dao->getByLogin($login);
         if (!$user) {
 
             // it's a new user, let's create it
