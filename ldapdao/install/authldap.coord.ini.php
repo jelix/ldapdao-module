@@ -96,6 +96,7 @@ profile = "jauth"
 ; except for the admin user.
 ; even if password_hash_method is activated, we set it to allow
 ; password storage migration
+; @deprecated
 password_crypt_function = sha1
 
 ; name of the form for the jauthdb_admin module
@@ -123,19 +124,6 @@ ldapAdminPassword="a_password"
 ; ldap
 jelixAdminLogin="admin"
 
-; the dn to bind the user to login. It can be a list of DN:
-;bindUserDN[]= ...
-;bindUserDN[]= ...
-bindUserDN="uid=%%LOGIN%%,ou=users,dc=XY,dc=fr"
-; Some LDAP server like Active Directory cannot use this but need a full DN specific for each user
-; in this case use the next bindUserDnProperty variable
-
-; the property containing the full user DN. It is needed e.g. for Active Directory
-; because the user must use its full unique DN to login
-; leave empty to only use the above DN configured with bindUserDN
-;bindUserDnProperty = "dn"
-bindUserDnProperty = ""
-
 ; search base dn. Used to search a user using the filter from searchUserFilter
 ; example for Active Directory: "ou=ADAM users,o=Microsoft,c=US", or "OU=Town,DC=my-town,DC=com"
 searchBaseDN="dc=XY,dc=fr"
@@ -143,6 +131,20 @@ searchBaseDN="dc=XY,dc=fr"
 ; filter to get user information, with the given login name
 ; example for Active Directory: "(sAMAccountName=%%LOGIN%%)"
 searchUserFilter="(&(objectClass=posixAccount)(uid=%%LOGIN%%))"
+; it can be a list:
+;searchUserFilter[]=...
+;searchUserFilter[]=...
+
+; the dn to bind the user to login.
+; The value can contain a `?` that will be replaced by the corresponding
+; attribute value readed from the result of searchUserFilter.
+; Or it can contain  `%%LOGIN%%`, replaced by the given login
+; Or it can contain only an attribute name, starting with a `$`: the
+; attribute should then contain a full DN.
+bindUserDN="uid=?,ou=users,dc=XY,dc=fr"
+;It can be a list of DN template:
+;bindUserDN[]= ...
+;bindUserDN[]= ...
 
 ; attributes to retrieve for a user
 ; for dao mapping: "ldap attribute:dao attribute"

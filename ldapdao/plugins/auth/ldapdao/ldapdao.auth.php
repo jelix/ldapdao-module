@@ -62,7 +62,13 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
                     $this->_params['searchAttributes'][trim($attr[0])] = trim($attr[1]);
                 }
             }
-            
+        }
+
+        if (!isset($this->_params['searchUserFilter']) || $this->_params['searchUserFilter'] == '') {
+            throw new jException('ldapdao~errors.searchUserFilter.missing');
+        }
+        if (!is_array($this->_params['searchUserFilter'])) {
+            $this->_params['searchUserFilter'] = array($this->_params['searchUserFilter']);
         }
 
         if (!isset($this->_params['bindUserDN']) || $this->_params['bindUserDN'] == '') {
@@ -105,13 +111,16 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
             return $user;
         }
 
-        $user = $this->createUserObject($login, '');
         $connect = $this->_bindLdapAdminUser();
         if ($connect === false) {
             return false;
         }
-        $this->searchLdapUserAttributes($connect, $login, $user);
+        $user = $this->createUserObject($login, '');
+        $found = $this->searchLdapUserAttributes($connect, $login, $user);
         ldap_close($connect);
+        if (!$found) {
+            return false;
+        }
         $dao->insert($user);
         return $user;
     }
@@ -136,9 +145,9 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
     public function verifyPassword($login, $password)
     {
         $dao = jDao::get($this->_params['dao'], $this->_params['profile']);
-        $user = $dao->getByLogin($login);
 
         if ($login == $this->_params['jelixAdminLogin']) {
+            $user = $dao->getByLogin($login);
             return $this->checkAdminLogin($user, $dao, $password);
         }
 
@@ -148,65 +157,38 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
             return false;
         }
 
-        $bind = null;
-
-        //authenticate user; let's try with all configured DN
-        foreach ($this->_params['bindUserDN'] as $dn) {
-            $realDn = str_replace(
-                array('%%LOGIN%%', '%%USERNAME%%'), // USERNAME deprecated
-                $login, $dn);
-            $bind = @ldap_bind($connect, $realDn, $password);
-            if ($bind) {
-                break;
-            }
+        // see if the user exists into the ldap directory
+        $user = $this->createUserObject($login, '');
+        $userLdapAttributes = $this->searchLdapUserAttributes($connect, $login, $user);
+        if ($userLdapAttributes === false) {
+            jLog::log('ldapdao: user '.$login.' not found', 'auth');
+            return false;
         }
+
+        // authenticate user. let's try with all configured DN
+        $bindOk = $this->bindUser($connect, $userLdapAttributes, $password);
         ldap_close($connect);
 
-        // First pass with direct login has not worked
-        // Connect as admin, to get more information on the user
-        // This is necessary in ActiveDirectory to get the user by full DN
-        if (!$bind && $this->_params['bindUserDnProperty'] != '') {
-            $aconnect = $this->_bindLdapAdminUser();
-            $dnProp = $this->_params['bindUserDnProperty'];
-
-            // Create user instance, but do not insert it into database
-            $user = $this->createUserObject($login, '');
-
-            //get ldap user infos: name, email etc...
-            if ($checkUser = $this->searchLdapUserAttributes($aconnect, $login, $user)) {
-                $connect = $this->_getLinkId();
-                $bind = @ldap_bind($connect, $user->$dnProp, $password);
-                ldap_close($connect);
-            }
-            ldap_close($aconnect);
-        }
-
-        if (!$bind) {
+        if (!$bindOk) {
             jLog::log('ldapdao: cannot bind to any configured path with the login ' . $login, 'auth');
             return false;
         }
 
-        $connect = $this->_bindLdapAdminUser();
-
         // check if he is in our database
-        if (!$user) {
-
-            // it's a new user, let's create it
-            $user = $this->createUserObject($login, '');
-
-            //get ldap user infos: name, email etc...
-            $this->searchLdapUserAttributes($connect, $login, $user);
+        $userDb = $dao->getByLogin($user->login);
+        if (!$userDb) {
             $dao->insert($user);
             jEvent::notify('AuthNewUser', array('user' => $user));
         }
 
         // retrieve the user group (if relevant)
+        $connect = $this->_bindLdapAdminUser();
         $userGroups = $this->searchUserGroups($connect, $login);
         ldap_close($connect);
         if ($userGroups !== false) {
             // the user is at least in a ldap group, so we synchronize ldap groups
             // with jAcl2 groups
-            $this->synchronizeAclGroups($login, $userGroups);
+            $this->synchronizeAclGroups($user->login, $userGroups);
         }
         return $user;
     }
@@ -238,22 +220,63 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         }
     }
 
+    /**
+     * @return string[]|false  ldap attributes or false if not found
+     */
     protected function searchLdapUserAttributes($connect, $login, $user) {
-        $filter = str_replace(array('%%LOGIN%%', '%%USERNAME%%'), // USERNAME deprecated
-                              $login,
-                              $this->_params['searchUserFilter']);
-
-        if (($search = ldap_search($connect,
-                                   $this->_params['searchBaseDN'],
-                                   $filter,
-                                   array_keys($this->_params['searchAttributes'])))) {
-            if (($entry = ldap_first_entry($connect, $search))) {
+        $searchAttributes = array_keys($this->_params['searchAttributes']);
+        foreach ($this->_params['searchUserFilter'] as $searchUserFilter) {
+            $filter = str_replace(
+                array('%%LOGIN%%', '%%USERNAME%%'), // USERNAME deprecated
+                $login,
+                $searchUserFilter);
+            $search = ldap_search(
+                            $connect,
+                            $this->_params['searchBaseDN'],
+                            $filter,
+                            $searchAttributes);
+            if ($search && ($entry = ldap_first_entry($connect, $search))) {
                 $attributes = ldap_get_attributes($connect, $entry);
-                $this->readLdapAttributes($attributes, $user);
-                return true;
+                return $this->readLdapAttributes($attributes, $user);
             }
         }
         return false;
+    }
+
+    protected function bindUser($connect, $userAttributes, $password) {
+        $bind = null;
+        foreach ($this->_params['bindUserDN'] as $dn) {
+            if (preg_match('/^$\w+$/', trim($dn))) {
+                $dnAttribute = substr($dn, 1);
+                if (isset($userAttributes[$dnAttribute])) {
+                    $realDn = $userAttributes[$dnAttribute];
+                }
+                else {
+                    continue;
+                }
+            }
+            else if (preg_match_all('/(\w+)=%\?%/', $dn, $m)) {
+                $realDn = $dn;
+                foreach($m[1] as $k => $attr) {
+                    if (isset($userAttributes[$attr])) {
+                        $realDn = str_replace($realDn, $m[0][$k], $attr.'='.$userAttributes[$attr]);
+                    }
+                    else {
+                        continue;
+                    }
+                }
+            }
+            else {
+                $realDn = str_replace(
+                    array('%%LOGIN%%', '%%USERNAME%%'), // USERNAME deprecated
+                    $login, $dn);
+            }
+            $bind = @ldap_bind($connect, $realDn, $password);
+            if ($bind) {
+                break;
+            }
+        }
+        return ($bind !== null);
     }
 
     protected function checkAdminLogin($user, $dao, $password) {
@@ -276,24 +299,31 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
     }
 
     protected function readLdapAttributes($attributes, $user) {
-        foreach($this->_params['searchAttributes'] as $ldapAttr => $objAttr) {
-
-            if (isset($attributes[$ldapAttr]) && is_array($attributes[$ldapAttr])) {
-                $attr = $attributes[$ldapAttr];
-                if (isset($attr['count']) && $attr['count'] > 0) {
-                    if ($attr['count'] > 1) {
-                        $user->$objAttr = array_shift($attr);
-                    }
-                    else {
-                        $user->$objAttr = $attr[0];
-                    }
+        $mapping = $this->_params['searchAttributes'];
+        $ldapAttributes = array();
+        foreach($attributes as $ldapAttr => $attr) {
+            if (isset($attr['count']) && $attr['count'] > 0) {
+                if ($attr['count'] > 1) {
+                    $val = array_shift($attr);
+                }
+                else {
+                    $val = $attr[0];
+                }
+                $ldapAttributes[$ldapAttr] = $val;
+                if (isset($mapping[$ldapAttr])) {
+                    $objAttr = $mapping[$ldapAttr];
+                    unset($mapping[$ldapAttr]);
+                    $user->$objAttr = $val;
                 }
             }
+        }
+
+        foreach( $mapping as $ldapAttr => $objAttr) {
             if (!isset($user->$objAttr)) {
                 $user->$objAttr = '';
             }
         }
-        return $user;
+        return $ldapAttributes;
     }
 
     protected function searchUserGroups($connect, $login) {
