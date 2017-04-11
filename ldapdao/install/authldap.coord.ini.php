@@ -124,9 +124,9 @@ ldapAdminPassword="a_password"
 ; ldap
 jelixAdminLogin="admin"
 
-; search base dn. Used to search a user using the filter from searchUserFilter
+; base dn to search users. Used to search a user using the filter from searchUserFilter
 ; example for Active Directory: "ou=ADAM users,o=Microsoft,c=US", or "OU=Town,DC=my-town,DC=com"
-searchBaseDN="dc=XY,dc=fr"
+searchUserBaseDN="dc=XY,dc=fr"
 
 ; filter to get user information, with the given login name
 ; example for Active Directory: "(sAMAccountName=%%LOGIN%%)"
@@ -167,3 +167,7 @@ searchGroupFilter=
 ; the property in the ldap entry corresponding to a group, that indicate the
 ; the group name
 searchGroupProperty="cn"
+
+; base dn to search groups. Used to search a group using the filter from searchGroupFilter
+searchGroupBaseDN=""
+

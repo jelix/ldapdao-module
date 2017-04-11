@@ -123,8 +123,8 @@ that will be replaced by the login given by the user.
 
 Example: `searchUserFilter="(&(objectClass=posixAccount)(uid=%%LOGIN%%))"`
 
-You may also indicate the base DN for the search, into `searchBaseDN`. Example:
-`searchBaseDN="ou=ADAM users,o=Microsoft,c=US"`.
+You may also indicate the base DN for the search, into `searchUserBaseDN`. Example:
+`searchUserBaseDN="ou=ADAM users,o=Microsoft,c=US"`.
 
 Note that you can indicate several search filter or dn templates, if you have
 complex ldap structure. Use `[]` to indicate an item list
@@ -180,4 +180,6 @@ a groups synchronization, leave `searchGroupFilter` empty.
 With `searchGroupProperty`, you must indicate the ldap attribute that
 contains the group name. Ex: `searchGroupProperty="cn"`.
 
+You may also indicate the base DN for the search, into `searchGroupBaseDN`. Example:
+`searchGroupBaseDN="ou=Groups,dc=Acme,dc=pt"`.
 

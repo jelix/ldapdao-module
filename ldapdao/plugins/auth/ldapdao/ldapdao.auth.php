@@ -32,7 +32,8 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
             'ldapAdminUserDn'      =>  null,
             'ldapAdminPassword'      =>  null,
             'protocolVersion'   =>  3,
-            'searchBaseDN' => ''
+            'searchUserBaseDN' => '',
+            'searchGroupBaseDN' => ''
         );
 
         // iterate each default parameter and apply it to actual params if missing in $params.
@@ -42,7 +43,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
             }
         }
 
-        if ($this->_params['searchBaseDN'] == '') {
+        if ($this->_params['searchUserBaseDN'] == '') {
             throw new jException('ldapdao~errors.search.base.missing');
         }
 
@@ -232,7 +233,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
                 $searchUserFilter);
             $search = ldap_search(
                             $connect,
-                            $this->_params['searchBaseDN'],
+                            $this->_params['searchUserBaseDN'],
                             $filter,
                             $searchAttributes);
             if ($search && ($entry = ldap_first_entry($connect, $search))) {
@@ -339,7 +340,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
 
         $groups = array();
         if (($search = ldap_search($connect,
-                                   $this->_params['searchBaseDN'],
+                                   $this->_params['searchGroupBaseDN'],
                                    $filter,
                                    array($grpProp)))) {
             $entry = ldap_first_entry($connect, $search);

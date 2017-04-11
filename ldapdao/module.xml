@@ -5,7 +5,7 @@
         <label lang="en_US">ldapdao</label>
         <description lang="en_US" />
         <license URL="http://www.mozilla.org/MPL/">Mozilla Public License</license>
-        <copyright>2014 3liz</copyright>
+        <copyright>2014 3liz, 2017 Innophi</copyright>
     </info>
     <dependencies>
         <jelix minversion="1.5" maxversion="1.7.*"/>
