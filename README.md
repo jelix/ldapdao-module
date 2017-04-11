@@ -123,7 +123,7 @@ Here the profile is named `myldapdao` so you should set `ldapprofile=myldapdao` 
 Configuration properties for login checking
 -------------------------------------------
 
-Starting from 1.2, the login process has changed, to take care of various
+Starting from 2.0.0, the login process has changed, to take care of various
 ldap structure and server configuration.
 
 To verify the password, the plugin needs the DN (Distinguished Name) corresponding 
