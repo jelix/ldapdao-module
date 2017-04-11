@@ -25,14 +25,23 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
 
         parent::__construct($params);
 
+        if (!isset($this->_params['ldapprofile']) || $this->_params['ldapprofile'] == '') {
+            throw new jException('ldapdao~errors.ldap.profile.missing');
+        }
+
+        $profile = jProfile::get('ldap', $this->_params['ldapprofile']);
+        $this->_params = array_merge($this->_params, $profile);
+
         // default ldap parameters
         $_default_params = array(
             'hostname'      =>  'localhost',
             'port'          =>  389,
-            'ldapAdminUserDn'      =>  null,
-            'ldapAdminPassword'      =>  null,
+            'adminUserDn'      =>  null,
+            'adminPassword'      =>  null,
             'protocolVersion'   =>  3,
             'searchUserBaseDN' => '',
+            'searchGroupFilter' => '',
+            'searchGroupProperty' => '',
             'searchGroupBaseDN' => ''
         );
 
@@ -375,11 +384,11 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         $connect = $this->_getLinkId();
         if (!$connect)
             return false;
-        if ($this->_params['ldapAdminUserDn'] == '') {
+        if ($this->_params['adminUserDn'] == '') {
             $bind = ldap_bind($connect);
         }
         else {
-            $bind = ldap_bind($connect, $this->_params['ldapAdminUserDn'], $this->_params['ldapAdminPassword']);
+            $bind = ldap_bind($connect, $this->_params['adminUserDn'], $this->_params['adminPassword']);
         }
         if (!$bind) {
             ldap_close($connect);

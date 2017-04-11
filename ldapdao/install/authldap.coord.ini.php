@@ -92,6 +92,9 @@ dao = "jauthdb~jelixuser"
 ; profile to use for jDb 
 profile = "jauth"
 
+; profile to use for ldap
+ldapprofile = ""
+
 ; ldap needs clear password to connect, this is useless for our plugin
 ; except for the admin user.
 ; even if password_hash_method is activated, we set it to allow
@@ -107,18 +110,6 @@ form = "jauthdb_admin~jelixuser"
 uploadsDirectory= ""
 
 ;--- ldap parameters
-; default "localhost"
-hostname="ldap://127.0.0.1:389"
-;hostname="ldaps://127.0.0.1:636"
-port=389
-;port=636 ; tls port
-
-; dn of the user to connect with LDAP (user who has right to list user and see their attributes)
-; other example: ldapAdminUserDn="CN=SOMELDAPUSER,OU=Some group,OU=Some other group,DC=my-city,DC=com"
-ldapAdminUserDn="uid=MYUID,ou=users,dc=XY,dc=fr"
-
-; password used to connect with LDAP
-ldapAdminPassword="a_password"
 
 ; this is the jelix user that have admin rights. It will not be verified in the
 ; ldap

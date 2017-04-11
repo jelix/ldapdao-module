@@ -79,16 +79,46 @@ auth="authldap.coord.ini.php"
 General configuration properties
 ---------------------------------
 
-First you should set the `dao`, `profile` and `form` properties, to indicate
-the dao (for the table), the form (for the administration module) and 
-the profile to access to the database.
+First you should set the `dao`, `profile`, `ldapprofile` and `form` properties, 
+to indicate the dao (for the table), the form (for the administration module) and 
+profiles to access to the database and the ldap.
 
-You should then set some ldap parameters to access to the ldap server: `hostname`
-and `port`. 
+For profiles, you should set connections parameters into the `var/config/profiles.ini.php`.
 
-You must also indicate in `ldapAdminUserDn` and `ldapAdminPassword`, the DN 
-(Distinguished Name) and the password of the user that have enough rights to 
-query the directory (to search a user, to get his attributes, his groups etc...).
+Example of a profile for the dao:
+
+```
+[jdb:myldapdao]
+driver="mysqli"
+host= "localhost"
+database="userdb"
+user= "admin"
+password="jelix"
+persistent= on
+force_encoding = on
+```
+
+Here the profile is named `myldapdao` so you should set `profile=myldapdao` into
+`authldap.coord.ini.php`.
+
+For the ldap profile, you should set `hostname`, `port`. You must also indicate 
+in `adminUserDn` and `adminPassword`, the DN (Distinguished Name) and the 
+password of the user that have enough rights to query the directory (to search a 
+user, to get his attributes, his groups etc...).
+
+Example of a profile for the ldap connection:
+
+```
+[ldap:myldapdao]
+hostname=localhost
+port=389
+adminUserDn="cn=admin,ou=admins,dc=acme"
+adminUserPassword="Sup3rP4ssw0rd"
+```
+
+Here the profile is named `myldapdao` so you should set `ldapprofile=myldapdao` into
+`authldap.coord.ini.php`.
+
 
 Configuration properties for login checking
 -------------------------------------------
