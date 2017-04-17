@@ -29,7 +29,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
             throw new jException('ldapdao~errors.ldap.profile.missing');
         }
 
-        $profile = jProfile::get('ldap', $this->_params['ldapprofile']);
+        $profile = jProfiles::get('ldap', $this->_params['ldapprofile']);
         $this->_params = array_merge($this->_params, $profile);
 
         // default ldap parameters
@@ -145,7 +145,13 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
     }
 
     public function getUserList($pattern){
-        throw new jException('ldapdao~errors.unsupported.user.listing');
+        $dao = jDao::get($this->_params['dao'], $this->_params['profile']);
+        if ($pattern == '%' || $pattern == ''){
+            return $dao->findAll();
+        }
+        else {
+            return $dao->findByLogin($pattern);
+        }
     }
 
     public function changePassword($login, $newpassword) {
@@ -176,10 +182,10 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         }
 
         // authenticate user. let's try with all configured DN
-        $bindOk = $this->bindUser($connect, $userLdapAttributes, $password);
+        $userDn = $this->bindUser($connect, $userLdapAttributes, $user->login, $password);
         ldap_close($connect);
 
-        if (!$bindOk) {
+        if ($userDn === false) {
             jLog::log('ldapdao: cannot bind to any configured path with the login ' . $login, 'auth');
             return false;
         }
@@ -193,7 +199,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
 
         // retrieve the user group (if relevant)
         $connect = $this->_bindLdapAdminUser();
-        $userGroups = $this->searchUserGroups($connect, $login);
+        $userGroups = $this->searchUserGroups($connect, $userDn, $userLdapAttributes, $user->login);
         ldap_close($connect);
         if ($userGroups !== false) {
             // the user is at least in a ldap group, so we synchronize ldap groups
@@ -253,10 +259,11 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         return false;
     }
 
-    protected function bindUser($connect, $userAttributes, $password) {
-        $bind = null;
+    protected function bindUser($connect, $userAttributes, $login, $password) {
+        $bind = false;
         foreach ($this->_params['bindUserDN'] as $dn) {
-            if (preg_match('/^$\w+$/', trim($dn))) {
+            if (preg_match('/^\\$\w+$/', trim($dn))) {
+
                 $dnAttribute = substr($dn, 1);
                 if (isset($userAttributes[$dnAttribute])) {
                     $realDn = $userAttributes[$dnAttribute];
@@ -269,10 +276,10 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
                 $realDn = $dn;
                 foreach($m[1] as $k => $attr) {
                     if (isset($userAttributes[$attr])) {
-                        $realDn = str_replace($realDn, $m[0][$k], $attr.'='.$userAttributes[$attr]);
+                        $realDn = str_replace($m[0][$k], $attr.'='.$userAttributes[$attr], $realDn);
                     }
                     else {
-                        continue;
+                        continue 2;
                     }
                 }
             }
@@ -286,7 +293,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
                 break;
             }
         }
-        return ($bind !== null);
+        return ($bind ? $realDn : false);
     }
 
     protected function checkAdminLogin($user, $dao, $password) {
@@ -336,14 +343,27 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         return $ldapAttributes;
     }
 
-    protected function searchUserGroups($connect, $login) {
+    protected function searchUserGroups($connect, $userDn, $userLdapAttributes, $login) {
         // Do not search for groups if no group filter passed
         // Usefull to forbid the driver to sync groups from LDAP and loose all related groups for the user
         if ($this->_params['searchGroupFilter'] == '') {
             return false;
         }
-        $filter = str_replace(array('%%LOGIN%%', '%%USERNAME%%'), // USERNAME deprecated
-                              $login,
+
+        $searchStr = array_keys($userLdapAttributes);
+        $searchStr[] = 'USERDN';
+        $searchStr[] = 'LOGIN';
+        $searchStr[] = 'USERNAME'; // USERNAME deprecated
+        $searchStr = array_map(function($val) {
+            return '%%'.$val.'%%';
+        }, $searchStr);
+        $values = array_values($userLdapAttributes);
+        $values[] = $userDn;
+        $values[] = $login;
+        $values[] = $login;
+
+        $filter = str_replace($searchStr,
+                              $values,
                               $this->_params['searchGroupFilter']);
         $grpProp = $this->_params['searchGroupProperty'];
 
@@ -353,12 +373,14 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
                                    $filter,
                                    array($grpProp)))) {
             $entry = ldap_first_entry($connect, $search);
-            do {
-                $attributes = ldap_get_attributes($connect, $entry);
-                if (isset($attributes[$grpProp]) && $attributes[$grpProp]['count'] > 0 ) {
-                    $groups[] = $attributes[$grpProp][0];
-                }
-            } while ($entry = ldap_next_entry($connect, $entry));
+            if ($entry) {
+                do {
+                    $attributes = ldap_get_attributes($connect, $entry);
+                    if (isset($attributes[$grpProp]) && $attributes[$grpProp]['count'] > 0 ) {
+                        $groups[] = $attributes[$grpProp][0];
+                    }
+                } while ($entry = ldap_next_entry($connect, $entry));
+            }
         }
         return $groups;
     }

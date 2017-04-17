@@ -143,7 +143,7 @@ property, and from various data:
    - Example with an attribute that contains the full DN:
      `bindUserDN="$dn"`. Here it takes the `dn` attribute readed from the search
      result, and use its full value as the DN to login against the ldap server.
-     It is usefull for some LDAP server like Active Directory that need a 
+     It is useful for some LDAP server like Active Directory that need a 
      full DN specific for each user.
      Note: the attribute name should be present into the `searchAttributes`
      configuration property, even with no field mapping. Ex: `...,dn:,...`
@@ -201,7 +201,11 @@ put the user into the application groups, according to the user ldap groups.
 You should then indicate into `searchGroupFilter` the ldap query that will
 retrieve the groups of the user.
 
-Example: `searchGroupFilter="(&(objectClass=posixGroup)(cn=XYZ*)(memberUid=%%LOGIN%%))"`
+Example: `searchGroupFilter="(&(objectClass=posixGroup)(member=%%USERDN%%))"`
+
+`%%USERDN%%` is replaced by the user dn.`%%LOGIN%%` is replaced by the login.  
+You can also use any ldap attributes you indicate into `searchAttributes`, 
+between `%%`. Example: `searchGroupFilter="(&(objectClass=posixGroup)(member=%%givenName%%))"`
 
 Warning : setting `searchGroupFilter` will remove the user from any other
 application groups that don't match the ldap group. If you don't want
