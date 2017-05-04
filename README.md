@@ -113,7 +113,7 @@ Example of a profile for the ldap connection:
 hostname=localhost
 port=389
 adminUserDn="cn=admin,ou=admins,dc=acme"
-adminUserPassword="Sup3rP4ssw0rd"
+adminPassword="Sup3rP4ssw0rd"
 ```
 
 Here the profile is named `myldapdao` so you should set `ldapprofile=myldapdao` into
