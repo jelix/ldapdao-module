@@ -34,6 +34,8 @@ class ldapdao_pluginAuthTest extends jUnitTestCase {
         jApp::config()->_pluginsPathList_auth['ldapdao'] = $dir.'ldapdao/';
 
         $conf = parse_ini_file(__DIR__.'/authldap.coord.ini',true);
+        jAuth::loadConfig($conf);
+
         require_once( JELIX_LIB_PATH.'plugins/coord/auth/auth.coord.php');
         jApp::coord()->plugins['auth'] = new AuthCoordPlugin($conf);
         $this->config = & jApp::coord()->plugins['auth']->config;
