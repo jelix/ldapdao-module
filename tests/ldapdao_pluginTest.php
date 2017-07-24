@@ -34,11 +34,13 @@ class ldapdao_pluginAuthTest extends jUnitTestCase {
         jApp::config()->_pluginsPathList_auth['ldapdao'] = $dir.'ldapdao/';
 
         $conf = parse_ini_file(__DIR__.'/authldap.coord.ini',true);
-        $conf['ldapdao']['searchUserBaseDN'] = str_replace('testapp16', TESTAPP_HOST, $conf['ldapdao']['searchUserBaseDN']);
-        $conf['ldapdao']['searchGroupBaseDN'] = str_replace('testapp16', TESTAPP_HOST, $conf['ldapdao']['searchGroupBaseDN']);
+        $cn = str_replace(".local", "", TESTAPP_HOST);
+        $conf['ldapdao']['searchUserBaseDN'] = str_replace('testapp16', $cn, $conf['ldapdao']['searchUserBaseDN']);
+        $conf['ldapdao']['searchGroupBaseDN'] = str_replace('testapp16', $cn, $conf['ldapdao']['searchGroupBaseDN']);
         foreach($conf['ldapdao']['bindUserDN'] as $k => $bindUserDN) {
-            $conf['ldapdao']['bindUserDN'][$k] = str_replace('testapp16', TESTAPP_HOST, $bindUserDN);
+            $conf['ldapdao']['bindUserDN'][$k] = str_replace('testapp16', $cn, $bindUserDN);
         }
+
         jAuth::loadConfig($conf);
 
         require_once( JELIX_LIB_PATH.'plugins/coord/auth/auth.coord.php');
