@@ -1,7 +1,7 @@
 Changes
 =======
 
-Version 2.0.0 (not released yet)
+Version 2.0.0 (2017-04-05)
 --------------------------------
 
 The login process has changed, to take care of various ldap structure and 

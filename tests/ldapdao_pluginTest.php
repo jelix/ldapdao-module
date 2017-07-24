@@ -25,7 +25,7 @@ class ldapdao_pluginAuthTest extends jUnitTestCase {
         jProfiles::createVirtualProfile('ldap','ldapdao', array(
             'hostname'=>'localhost',
             'port'=>389,
-            'ldapUser'=>"cn=admin,dc=testapp16,dc=local",
+            'ldapUser'=>"cn=admin,dc=".TESTAPP_HOST.",dc=local",
             'ldapPassword'=>"passjelix"
         ));
 
@@ -34,6 +34,11 @@ class ldapdao_pluginAuthTest extends jUnitTestCase {
         jApp::config()->_pluginsPathList_auth['ldapdao'] = $dir.'ldapdao/';
 
         $conf = parse_ini_file(__DIR__.'/authldap.coord.ini',true);
+        $conf['ldapdao']['searchUserBaseDN'] = str_replace('testapp16', TESTAPP_HOST, $conf['ldapdao']['searchUserBaseDN']);
+        $conf['ldapdao']['searchGroupBaseDN'] = str_replace('testapp16', TESTAPP_HOST, $conf['ldapdao']['searchGroupBaseDN']);
+        foreach($conf['ldapdao']['bindUserDN'] as $k => $bindUserDN) {
+            $conf['ldapdao']['bindUserDN'][$k] = str_replace('testapp16', TESTAPP_HOST, $bindUserDN);
+        }
         jAuth::loadConfig($conf);
 
         require_once( JELIX_LIB_PATH.'plugins/coord/auth/auth.coord.php');
