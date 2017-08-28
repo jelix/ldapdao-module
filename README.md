@@ -79,11 +79,34 @@ auth="authldap.coord.ini.php"
 General configuration properties
 ---------------------------------
 
-First you should set the `dao`, `profile`, `ldapprofile` and `form` properties, 
-to indicate the dao (for the table), the form (for the administration module) and 
-profiles to access to the database and the ldap.
+First you should set the `dao`, `profile`, `ldapprofile` and `form` properties
+in the `ldapdao` section of `authldap.coord.ini.php`, to indicate the dao 
+(for the table), the form (for the administration module) and profiles to access 
+to the database and the ldap.
 
-For profiles, you should set connections parameters into the `var/config/profiles.ini.php`.
+Here is an example:
+
+```
+[ldapdao]
+
+; name of the dao to get user data. It may differ depending
+; to the application
+dao = "jauthdb~jelixuser"
+
+; name of the form for the jauthdb_admin module. It may differ depending
+; to the application
+form = "jauthdb_admin~jelixuser"
+
+; profile to use for jDb 
+profile = "myldapdao"
+
+; profile to use for ldap
+ldapprofile = "myldap"
+
+```
+
+For profiles, you should set connections parameters into the 
+`var/config/profiles.ini.php` file.
 
 Example of a profile for the dao:
 
@@ -109,15 +132,17 @@ user, to get his attributes, his groups etc...).
 Example of a profile for the ldap connection:
 
 ```
-[ldap:myldapdao]
+[ldap:myldap]
 hostname=localhost
 port=389
 adminUserDn="cn=admin,ou=admins,dc=acme"
 adminPassword="Sup3rP4ssw0rd"
 ```
 
-Here the profile is named `myldapdao` so you should set `ldapprofile=myldapdao` into
+Here the profile is named `myldap` so you should set `ldapprofile=myldap` into
 `authldap.coord.ini.php`.
+
+If you want to use SSL for the ldap connection, try `hostname=ldaps://my.server/`.
 
 
 Configuration properties for login checking
