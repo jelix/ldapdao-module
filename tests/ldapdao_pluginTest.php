@@ -17,6 +17,8 @@ class ldapdao_pluginAuthTest extends jUnitTestCase {
 
     protected $config;
 
+    protected $listenersBackup;
+
     function setUp(){
         parent::setUp();
         self::initClassicRequest(TESTAPP_URL.'index.php');
@@ -47,6 +49,12 @@ class ldapdao_pluginAuthTest extends jUnitTestCase {
         jApp::coord()->plugins['auth'] = new AuthCoordPlugin($conf);
         $this->config = & jApp::coord()->plugins['auth']->config;
         $_SESSION[$this->config['session_name']] = new jAuthDummyUser();
+
+        // disable listener of jacl2db so testldap could be remove without
+        // verifying if there is still an admin
+        $this->listenersBackup = jApp::config()->disabledListeners;
+        jApp::config()->disabledListeners['AuthCanRemoveUser'] = 'jacl2db~jacl2db';
+        jEvent::clearCache();
     }
 
     function tearDown(){
@@ -54,6 +62,8 @@ class ldapdao_pluginAuthTest extends jUnitTestCase {
         unset(jApp::coord()->plugins['auth']);
         unset($_SESSION[$this->config['session_name']]);
         $this->config = null;
+        jApp::config()->disabledListeners = $this->listenersBackup;
+        jEvent::clearCache();
     }
     public function testEmptyUsersList()
     {
