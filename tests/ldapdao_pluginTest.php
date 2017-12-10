@@ -55,6 +55,10 @@ class ldapdao_pluginAuthTest extends jUnitTestCase {
         $this->listenersBackup = jApp::config()->disabledListeners;
         jApp::config()->disabledListeners['AuthCanRemoveUser'] = 'jacl2db~jacl2db';
         jEvent::clearCache();
+        $cacheFile = jApp::tempPath('compiled/'.jApp::config()->urlengine['urlScriptId'].'.events.php');
+        if (file_exists($cacheFile)) {
+            unlink($cacheFile);
+        }
     }
 
     function tearDown(){
@@ -64,6 +68,10 @@ class ldapdao_pluginAuthTest extends jUnitTestCase {
         $this->config = null;
         jApp::config()->disabledListeners = $this->listenersBackup;
         jEvent::clearCache();
+        $cacheFile = jApp::tempPath('compiled/'.jApp::config()->urlengine['urlScriptId'].'.events.php');
+        if (file_exists($cacheFile)) {
+            unlink($cacheFile);
+        }
     }
     public function testEmptyUsersList()
     {
