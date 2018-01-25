@@ -1,21 +1,21 @@
 <?php
 /**
-*/
+ */
 
 /**
-* LDAP authentification driver for authentification information stored in LDAP server
-* and manage user locally with a dao
-* @package    jelix
-* @subpackage auth_driver
-*/
+ * LDAP authentification driver for authentification information stored in LDAP server
+ * and manage user locally with a dao
+ * @package    jelix
+ * @subpackage auth_driver
+ */
 class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
 
     /**
-    * default user attributes list
-    * @var array
-    */
+     * default user attributes list
+     * @var array
+     */
     protected $_default_attributes = array("cn"=>"lastname",
-                                           "name"=>"firstname");
+        "name"=>"firstname");
 
     function __construct($params){
 
@@ -69,7 +69,11 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
                 }
                 else {
                     $attr = explode(':', $attr);
-                    $this->_params['searchAttributes'][trim($attr[0])] = trim($attr[1]);
+                    $val = trim($attr[1]);
+                    if ($val == '') {
+                        $val = trim($attr[0]);
+                    }
+                    $this->_params['searchAttributes'][trim($attr[0])] = $val;
                 }
             }
         }
@@ -140,7 +144,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         $user->login = $login;
         // should not be empty because of a jauth listener that prevent
         // user not having password to login.
-        $user->password = 'no password'; 
+        $user->password = 'no password';
         return $user;
     }
 
@@ -216,7 +220,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
     protected function synchronizeAclGroups($login, $userGroups) {
         // we know the user group: we should be sure it is the same in jAcl2
         $gplist = jDao::get('jacl2db~jacl2groupsofuser', 'jacl2_profile')
-                        ->getGroupsUser($login);
+            ->getGroupsUser($login);
         $groupsToRemove = array();
         foreach($gplist as $group) {
             if ($group->grouptype == 2 ) { // private group
@@ -251,10 +255,10 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
                 $login,
                 $searchUserFilter);
             $search = ldap_search(
-                            $connect,
-                            $this->_params['searchUserBaseDN'],
-                            $filter,
-                            $searchAttributes);
+                $connect,
+                $this->_params['searchUserBaseDN'],
+                $filter,
+                $searchAttributes);
             if ($search && ($entry = ldap_first_entry($connect, $search))) {
                 $attributes = ldap_get_attributes($connect, $entry);
                 return $this->readLdapAttributes($attributes, $user);
@@ -367,15 +371,15 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         $values[] = $login;
 
         $filter = str_replace($searchStr,
-                              $values,
-                              $this->_params['searchGroupFilter']);
+            $values,
+            $this->_params['searchGroupFilter']);
         $grpProp = $this->_params['searchGroupProperty'];
 
         $groups = array();
         if (($search = ldap_search($connect,
-                                   $this->_params['searchGroupBaseDN'],
-                                   $filter,
-                                   array($grpProp)))) {
+            $this->_params['searchGroupBaseDN'],
+            $filter,
+            array($grpProp)))) {
             $entry = ldap_first_entry($connect, $search);
             if ($entry) {
                 do {
