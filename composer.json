@@ -4,7 +4,7 @@
     "description": "module for Jelix,allowing to authenticate with an ldap server and to register users locally.",
     "keywords": ["ldap", "dao", "jelix"],
     "homepage": "http://jelix.org",
-    "license": "LGPL-2.1",
+    "license": "MPL-2.0",
     "authors": [
         {
             "name": "Laurent Jouanneau",
