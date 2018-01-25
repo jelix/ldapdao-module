@@ -167,20 +167,25 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
             return $this->checkAdminLogin($user, $dao, $password);
         }
 
-        $connect = $this->_getLinkId();
-        if (!$connect) {
-            jLog::log('ldapdao: impossible to connect to ldap', 'auth');
+        $connectAdmin = $this->_bindLdapAdminUser();
+        if (!$connectAdmin) {
+            jLog::log('ldapdao: impossible to connect to ldap with admin user', 'auth');
             return false;
         }
 
         // see if the user exists into the ldap directory
         $user = $this->createUserObject($login, '');
-        $userLdapAttributes = $this->searchLdapUserAttributes($connect, $login, $user);
+        $userLdapAttributes = $this->searchLdapUserAttributes($connectAdmin, $login, $user);
         if ($userLdapAttributes === false) {
             jLog::log('ldapdao: user '.$login.' not found', 'auth');
             return false;
         }
 
+        $connect = $this->_getLinkId();
+        if (!$connect) {
+            jLog::log('ldapdao: impossible to connect to ldap', 'auth');
+            return false;
+        }
         // authenticate user. let's try with all configured DN
         $userDn = $this->bindUser($connect, $userLdapAttributes, $user->login, $password);
         ldap_close($connect);
@@ -198,9 +203,8 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         }
 
         // retrieve the user group (if relevant)
-        $connect = $this->_bindLdapAdminUser();
-        $userGroups = $this->searchUserGroups($connect, $userDn, $userLdapAttributes, $user->login);
-        ldap_close($connect);
+        $userGroups = $this->searchUserGroups($connectAdmin, $userDn, $userLdapAttributes, $user->login);
+        ldap_close($connectAdmin);
         if ($userGroups !== false) {
             // the user is at least in a ldap group, so we synchronize ldap groups
             // with jAcl2 groups
