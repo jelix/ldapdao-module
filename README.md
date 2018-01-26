@@ -145,64 +145,18 @@ Here the profile is named `myldap` so you should set `ldapprofile=myldap` into
 If you want to use SSL for the ldap connection, try `hostname=ldaps://my.server/`.
 
 
-Configuration properties for login checking
--------------------------------------------
-
-Starting from 2.0.0, the login process has changed, to take care of various
-ldap structure and server configuration.
-
-To verify the password, the plugin needs the DN (Distinguished Name) corresponding 
-to the user. It builds the DN from a "template" indicated into the `bindUserDN`
-property, and from various data:
-
-- From the login given by the user. Example: `bindUserDN="uid=%%LOGIN%%,ou=users,dc=XY,dc=fr"`
-  where `%%LOGIN%%` is replaced by the login given by the user.
-- Or from one of the ldap attributes of the user. In this case, the plugin query
-  the ldap directory with the `searchUserFilter` filter, to retrieve the user's
-  ldap attributes.
-   - Example with one attribute value which is part of the DN:
-     `bindUserDN="uid=%?%,ou=users,dc=XY,dc=fr"`. Here it replaces the `%?%` by the
-     value of the `uid` attribute readed from the search result.
-     Note: the attribute name should be present into the `searchAttributes`
-     configuration property, even with no field mapping. Ex: `...,uid:,...`
-   - Example with an attribute that contains the full DN:
-     `bindUserDN="$dn"`. Here it takes the `dn` attribute readed from the search
-     result, and use its full value as the DN to login against the ldap server.
-     It is useful for some LDAP server like Active Directory that need a 
-     full DN specific for each user.
-     Note: the attribute name should be present into the `searchAttributes`
-     configuration property, even with no field mapping. Ex: `...,dn:,...`
-     
-The `searchUserFilter` should contain the ldap query, and a `%%LOGIN%%` placeholder
-that will be replaced by the login given by the user.
-
-Example: `searchUserFilter="(&(objectClass=posixAccount)(uid=%%LOGIN%%))"`
-
-You may also indicate the base DN for the search, into `searchUserBaseDN`. Example:
-`searchUserBaseDN="ou=ADAM users,o=Microsoft,c=US"`.
-
-Note that you can indicate several search filter or dn templates, if you have
-complex ldap structure. Use `[]` to indicate an item list
-
-```
-searchUserFilter[]="(&(objectClass=posixAccount)(uid=%%LOGIN%%))"
-searchUserFilter[]="(&(objectClass=posixAccount)(cn=%%LOGIN%%))"
-
-bindUserDN[]="uid=%?%,ou=users,dc=XY,dc=fr"
-bindUserDN[]="cn=%?%,ou=users,dc=XY,dc=fr"
-```
 
 Configuration properties for user data
 --------------------------------------
 
-When a user is authenticated with the ldap, but it is not registered into
-the list of users of Jelix, the plugin creates automatically an account into
-the application.
+To verify password, or to register the user into the Jelix application the
+first time he authenticate himself, the plugin needs some data about the user.
 
-To achieve this goal, it needs which ldap attributes to take, and in which
-database field to store these attribute values. You indicate such informations
-into the `searchAttributes` property. It is a pair of names, 
-`<ldap attribute>:<table field>`, separated by a comma.
+You should indicate to it which ldap attributes it can retrieve, and which
+database fields that will receive the ldap attributes values.
+
+You indicate such informations into the `searchAttributes` property. It is a 
+pair of names, `<ldap attribute>:<table field>`, separated by a comma.
 
 In this example, `searchAttributes="uid:login,givenName,sn:lastname,mail:email,dn:"`:
 
@@ -212,9 +166,85 @@ In this example, `searchAttributes="uid:login,givenName,sn:lastname,mail:email,d
   have the same name, as there is no field name nor `:`.
 - there will not be mapping for the `dn` property. There is a `:` without field name.
   It will be readed from ldap, and can be used into the `bindUserDN` DN template.
+  (see below).
 
 The possible list of possible fields is indicated into the dao file, whose name
 is indicated into the `dao` configuration property.
+
+
+Configuration properties for authentication
+-------------------------------------------
+
+Starting from 2.0.0, the login process has changed, to take care of various
+ldap structure and server configuration.
+
+Before to try to authenticate the user against the ldap, the plugin retrieves
+user properties. It uses two configuration parameters : `searchUserFilter`
+and `searchAttributes`.
+
+The `searchUserFilter` should contain the ldap query, and a `%%LOGIN%%` placeholder
+that will be replaced by the login given by the user.
+
+Example: `searchUserFilter="(&(objectClass=posixAccount)(uid=%%LOGIN%%))"`
+
+You may also indicate the base DN for the search, into `searchUserBaseDN`. Example:
+`searchUserBaseDN="ou=ADAM users,o=Microsoft,c=US"`.
+
+Note that you can indicate several search filters, if you have
+complex ldap structure. Use `[]` to indicate an item list:
+
+```
+searchUserFilter[]="(&(objectClass=posixAccount)(uid=%%LOGIN%%))"
+searchUserFilter[]="(&(objectClass=posixAccount)(cn=%%LOGIN%%))"
+```
+
+To verify the password, the plugin needs the DN (Distinguished Name) corresponding 
+to the user. It builds the DN from a "template" indicated into the `bindUserDN`
+property, and from various data. These data can be the given login or one of
+the ldap attributes of the user.
+
+- Building the DN from the login given by the user: bindUserDN should contain
+  a DN, with a `%%LOGIN%%` placeholder that will be replaced by the login.
+
+  Example: `bindUserDN="uid=%%LOGIN%%,ou=users,dc=XY,dc=fr"`. If the user
+  give `john.smith` as a login, the authentication will be made with the DN
+  `bindUserDN="uid=john.smith,ou=users,dc=XY,dc=fr"`.
+
+  For some LDAP, the DN could be a simple string, for example an email. 
+  You could then set `bindUserDN="%%LOGIN%%@company.local"`. Or even 
+  `bindUserDN="%%LOGIN%%"` if the login can type the full value of
+  the DN or an email or else.. (Probably it's not recommended to allow
+  a user to type himself its full DN, it can be a security issue)
+
+- Building the DN from one of the ldap attributes of the user. 
+  In this case, the plugin will first query the ldap directory with the 
+  `searchUserFilter` filter, to retrieve the user's ldap attributes.
+  Then, in bindUserDN, you can indicate a DN where some values will be replaced
+  by some attributes values, or you can indicate a single attribute name,
+  corresponding to an attribute that contain the full DN of the user.
+  
+  For the first case, bindUserDn should contain a DN, with some `%?%` placeholders
+  that will be replaced by corresponding attributes value. Example:
+  `bindUserDN="uid=%?%,ou=users,dc=XY,dc=fr"`. Here it replaces the `%?%` by the
+  value of the `uid` attribute readed from the user's attributes.
+  The attribute name should be present into the `searchAttributes`
+  configuration property, even with no field mapping. Ex: `...,uid,...`. See above.
+  
+  For the second case, just indicate the attribute name, prefixed with a `$`.
+  Example: `bindUserDN="$dn"`. Here it takes the `dn` attribute readed from 
+  the search, and use its full value as the DN to login against the ldap server.
+  It is useful for some LDAP server like sometimes Active Directory that need a 
+  full DN specific for each user.
+  The attribute name should be present into the `searchAttributes`
+  configuration property, even with no field mapping. Ex: `...,dn:,...`. See above.
+
+Note that you can indicate several dn templates, if you have
+complex ldap structure. Use `[]` to indicate an item list:
+
+```
+bindUserDN[]="uid=%?%,ou=users,dc=XY,dc=fr"
+bindUserDN[]="cn=%?%,ou=users,dc=XY,dc=fr"
+```
 
 Configuration properties for user rights
 ----------------------------------------
