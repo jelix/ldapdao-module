@@ -173,7 +173,6 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
 
         $connectAdmin = $this->_bindLdapAdminUser();
         if (!$connectAdmin) {
-            jLog::log('ldapdao: impossible to connect to ldap with admin user', 'auth');
             return false;
         }
 
@@ -181,7 +180,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         $user = $this->createUserObject($login, '');
         $userLdapAttributes = $this->searchLdapUserAttributes($connectAdmin, $login, $user);
         if ($userLdapAttributes === false) {
-            jLog::log('ldapdao: user '.$login.' not found', 'auth');
+            jLog::log('ldapdao: user '.$login.' not found into the ldap', 'auth');
             return false;
         }
 
@@ -195,7 +194,10 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         ldap_close($connect);
 
         if ($userDn === false) {
-            jLog::log('ldapdao: cannot bind to any configured path with the login ' . $login, 'auth');
+            jLog::log('ldapdao: cannot authenticate to ldap with given bindUserDN for the login ' . $login. '. Wrong DN or password', 'auth');
+            foreach($this->bindUserDnTries as $dn) {
+                jLog::log('ldapdao:  tried to connect with bindUserDN=' . $dn, 'auth');
+            }
             return false;
         }
 
@@ -267,8 +269,11 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
         return false;
     }
 
+    protected $bindUserDnTries = array();
+
     protected function bindUser($connect, $userAttributes, $login, $password) {
         $bind = false;
+        $this->bindUserDnTries = array();
         foreach ($this->_params['bindUserDN'] as $dn) {
             if (preg_match('/^\\$\w+$/', trim($dn))) {
 
@@ -299,6 +304,9 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
             $bind = @ldap_bind($connect, $realDn, $password);
             if ($bind) {
                 break;
+            }
+            else {
+                $this->bindUserDnTries[] = $realDn;
             }
         }
         return ($bind ? $realDn : false);
@@ -412,8 +420,11 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
      */
     protected function _bindLdapAdminUser() {
         $connect = $this->_getLinkId();
-        if (!$connect)
+        if (!$connect) {
+            jLog::log('ldapdao: impossible to connect to ldap', 'auth');
             return false;
+        }
+
         if ($this->_params['adminUserDn'] == '') {
             $bind = ldap_bind($connect);
         }
@@ -421,6 +432,12 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
             $bind = ldap_bind($connect, $this->_params['adminUserDn'], $this->_params['adminPassword']);
         }
         if (!$bind) {
+            if ($this->_params['adminUserDn'] == '') {
+                jLog::log('ldapdao: impossible to authenticate to ldap as anonymous admin user', 'auth');
+            }
+            else {
+                jLog::log('ldapdao: impossible to authenticate to ldap with admin user '.$this->_params['adminUserDn'], 'auth');
+            }
             ldap_close($connect);
             return false;
         }
