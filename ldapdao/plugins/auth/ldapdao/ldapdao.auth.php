@@ -69,11 +69,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
                 }
                 else {
                     $attr = explode(':', $attr);
-                    $val = trim($attr[1]);
-                    if ($val == '') {
-                        $val = trim($attr[0]);
-                    }
-                    $this->_params['searchAttributes'][trim($attr[0])] = $val;
+                    $this->_params['searchAttributes'][trim($attr[0])] = trim($attr[1]);
                 }
             }
         }
@@ -346,13 +342,15 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver {
                 if (isset($mapping[$ldapAttr])) {
                     $objAttr = $mapping[$ldapAttr];
                     unset($mapping[$ldapAttr]);
-                    $user->$objAttr = $val;
+                    if ($objAttr != '') {
+                        $user->$objAttr = $val;
+                    }
                 }
             }
         }
 
         foreach( $mapping as $ldapAttr => $objAttr) {
-            if (!isset($user->$objAttr)) {
+            if ($objAttr != '' && !isset($user->$objAttr)) {
                 $user->$objAttr = '';
             }
         }
