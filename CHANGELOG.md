@@ -1,8 +1,18 @@
 Changes
 =======
 
+Version 2.0.1 (2018-01-29)
+--------------------------
+
+- Fix: attributes search were made anonymously, which is not allowed in some 
+  LDAP server
+- Fix support of attributes declaration having no mapping like `foo:`
+- Improved the configuration manual
+- Fix some unit tests
+
+
 Version 2.0.0 (2017-04-05)
---------------------------------
+--------------------------
 
 The login process has changed, to take care of various ldap structure and 
 server configuration.
