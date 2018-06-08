@@ -43,6 +43,11 @@ jauth.access=2
 jauthdb.access=1
 ```
 
+If you are using the jCommunity module, you should not activate jauthdb, so keep
+`jauthdb.access=0`.
+
+
+
 Launch the installer
 --------------------
 
@@ -137,6 +142,13 @@ hostname=localhost
 port=389
 adminUserDn="cn=admin,ou=admins,dc=acme"
 adminPassword="Sup3rP4ssw0rd"
+searchUserBaseDN="dc=XY,dc=fr"
+searchUserFilter="(&(objectClass=posixAccount)(uid=%%LOGIN%%))"
+bindUserDN="uid=%?%,ou=users,dc=XY,dc=fr"
+searchAttributes="uid:login,givenName:firstname,sn:lastname,mail:email"
+searchGroupFilter="(&(objectClass=posixGroup)(cn=XYZ*)(memberUid=%%LOGIN%%))"
+searchGroupProperty="cn"
+searchGroupBaseDN=""
 ```
 
 Here the profile is named `myldap` so you should set `ldapprofile=myldap` into

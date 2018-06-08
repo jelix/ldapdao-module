@@ -145,7 +145,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver
         $user->login = $login;
         // should not be empty because of a jauth listener that prevent
         // user not having password to login.
-        $user->password = 'no password';
+        $user->password = '!!ldapdao password!!';
         return $user;
     }
 
@@ -206,8 +206,15 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver
         // check if he is in our database
         $userDb = $dao->getByLogin($user->login);
         if (!$userDb) {
+            if (jApp::isModuleEnabled('jcommunity')) {
+                $user->status = 1; // STATUS_VALID
+            }
             $dao->insert($user);
-            jEvent::notify('AuthNewUser', array('user' => $user));
+            $eventResp = jEvent::notify('AuthNewUser', array('user' => $user));
+            $allResponses = array();
+            if ($eventResp->inResponse('doUpdate', true, $allResponses)) {
+                $dao->update($user);
+            }
         }
 
         // retrieve the user group (if relevant)

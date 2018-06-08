@@ -16,6 +16,8 @@ class ldapdaoModuleInstaller extends jInstallerModule {
             $daoright->deleteBySubject('auth.user.change.password');
             //$daoright->deleteBySubject('auth.users.delete');
         }
-        $this->copyFile('authldap.coord.ini.php', 'config:authldap.coord.ini.php', false);
+        if (!$this->getParameter('noconfigfile')) {
+            $this->copyFile('authldap.coord.ini.php', 'config:authldap.coord.ini.php', false);
+        }
     }
 }
