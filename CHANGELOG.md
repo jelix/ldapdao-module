@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 2.0.3 (2018-07-03)
+--------------------------
+
+- Fix: allow the admin user to change his password
+- Fix: in some case, the user was recognized only at the first login
+
 Version 2.0.2 (2018-06-08)
 --------------------------
 
