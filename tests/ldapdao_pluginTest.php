@@ -100,7 +100,7 @@ class ldapdao_pluginAuthTest extends jUnitTestCase {
         $userCheck="<object>
                 <string property=\"login\">john</string>
                 <string property=\"email\">john@jelix.org</string>
-                <string property=\"password\" value=\"no password\" />
+                <string property=\"password\" value=\"!!ldapdao password!!\" />
             </object>";
         $this->assertComplexIdenticalStr($user1, $userCheck);
 
@@ -109,7 +109,7 @@ class ldapdao_pluginAuthTest extends jUnitTestCase {
         $userCheck="<object>
                 <string property=\"login\">jane</string>
                 <string property=\"email\">jane@jelix.org</string>
-                <string property=\"password\" value=\"no password\" />
+                <string property=\"password\" value=\"!!ldapdao password!!\" />
             </object>";
         $this->assertComplexIdenticalStr($user1, $userCheck);
 
@@ -153,12 +153,12 @@ class ldapdao_pluginAuthTest extends jUnitTestCase {
             <object>
                 <string property=\"login\">john</string>
                 <string property=\"email\">john@jelix.org</string>
-                <string property=\"password\" value=\"no password\" />
+                <string property=\"password\" value=\"!!ldapdao password!!\" />
             </object>
             <object>
                 <string property=\"login\">jane</string>
                 <string property=\"email\">jane@jelix.org</string>
-                <string property=\"password\" value=\"no password\" />
+                <string property=\"password\" value=\"!!ldapdao password!!\" />
             </object>
         </array>";
 
@@ -171,7 +171,7 @@ class ldapdao_pluginAuthTest extends jUnitTestCase {
         $userCheck="<object>
                 <string property=\"login\">john</string>
                 <string property=\"email\">john@jelix.org</string>
-                <string property=\"password\" value=\"no password\" />
+                <string property=\"password\" value=\"!!ldapdao password!!\" />
             </object>";
         $this->assertComplexIdenticalStr($user1, $userCheck);
     }
@@ -185,7 +185,7 @@ class ldapdao_pluginAuthTest extends jUnitTestCase {
         $userCheck="<object>
                 <string property=\"login\">john</string>
                 <string property=\"email\">test2@jelix.org</string>
-                <string property=\"password\" value=\"no password\" />
+                <string property=\"password\" value=\"!!ldapdao password!!\" />
             </object>";
         $this->assertComplexIdenticalStr($myUserLDAP, $userCheck);
     }
