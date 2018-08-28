@@ -8,9 +8,12 @@
         <copyright>2014 3liz, 2017-2018 Innophi</copyright>
     </info>
     <dependencies>
-        <jelix minversion="1.5" maxversion="1.7.*"/>
+        <jelix minversion="1.6.19" maxversion="1.7.*"/>
         <module name="jacl2"/>
         <module name="jauth"/>
-        <!--module name="jauthdb" /-->
+        <choice>
+            <module name="jauthdb" />
+            <module name="jcommunity" />
+        </choice>
     </dependencies>
 </module>

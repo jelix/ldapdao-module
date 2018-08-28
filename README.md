@@ -7,26 +7,29 @@ This module is for Jelix 1.6.x and higher.
 Installation
 ============
 
-Install files with Jelix 1.7 (experimental)
------------------------------
+Install with Jelix 1.7
+----------------------
+
 You should use Composer to install the module. Run this commands in a shell:
                                                
 ```
 composer require "jelix/ldapdao-module"
 ```
 
-Install files with Jelix 1.6
------------------------------
+Launch the configurator for your application to enable the module
+
+```bash
+php yourapp/cmd.php module:configure ldapdao
+```
+
+
+Install with Jelix 1.6
+----------------------
 
 Copy the `ldapdao` directory into the modules/ directory of your application.
 
-
-Declare the module
--------------------
-
 Next you must say to Jelix that you want to use the module. Declare
-it into the mainconfig.ini.php file (into yourapp/var/config/ for Jelix 1.6,
-or into yourapp/app/config/ for Jelix 1.7).
+it into the var/config/mainconfig.ini.php file.
 
 In the `[modules]` section, add:
 
@@ -54,7 +57,7 @@ Launch the installer
 In the command line, launch:
 
 ```
-php yourapp/cmd.php install
+php yourapp/install/installer.php
 ```
 
 Configuration
