@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 2.0.5 (2018-11-20)
+--------------------------
+
+- fix error during the installation
+
 Version 2.0.4 (2018-07-27)
 --------------------------
 
