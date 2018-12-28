@@ -7,7 +7,7 @@ This module is for Jelix 1.6.x and higher.
 Installation
 ============
 
-Install with Jelix 1.7
+Configuration with Jelix 1.7
 ----------------------
 
 You should use Composer to install the module. Run this commands in a shell:
@@ -23,8 +23,8 @@ php yourapp/cmd.php module:configure ldapdao
 ```
 
 
-Install with Jelix 1.6
-----------------------
+Configuration with Jelix 1.6
+-----------------------------
 
 Copy the `ldapdao` directory into the modules/ directory of your application.
 
@@ -109,7 +109,7 @@ form = "jauthdb_admin~jelixuser"
 profile = "myldapdao"
 
 ; profile to use for ldap
-ldapprofile = "myldap"
+ldapprofile = "ldapdao"
 
 ```
 
@@ -140,7 +140,7 @@ user, to get his attributes, his groups etc...).
 Example of a profile for the ldap connection:
 
 ```
-[ldap:myldap]
+[ldap:ldapdao]
 hostname=localhost
 port=389
 adminUserDn="cn=admin,ou=admins,dc=acme"
