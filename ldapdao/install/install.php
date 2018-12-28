@@ -8,9 +8,8 @@
  */
 class ldapdaoModuleInstaller extends \Jelix\Installer\Module\Installer {
 
-    function install() {
-
-
+    function install(\Jelix\Installer\Module\API\InstallHelpers $helpers) {
+        
         // we should disable some rights
         $daoright = jDao::get('jacl2db~jacl2rights', 'jacl2_profile');
         $daoright->deleteBySubject('auth.users.create');
@@ -19,8 +18,10 @@ class ldapdaoModuleInstaller extends \Jelix\Installer\Module\Installer {
         //$daoright->deleteBySubject('auth.users.delete');
 
         // allow the admin user to change his right
-        $confIni = parse_ini_file($this->getAuthConfFile(), true);
+        $authconfig = $helpers->getConfigIni()->getValue('auth','coordplugins');
+        $confIni = parse_ini_file(jApp::appConfigPath($authconfig), true);
         $authConfig = jAuth::loadConfig($confIni);
+
         if (isset($authConfig['ldapdao'])) {
             // authldap.coord.ini.php was already installed, we can take
             // the admin user indicated into it
@@ -34,10 +35,5 @@ class ldapdaoModuleInstaller extends \Jelix\Installer\Module\Installer {
             jAcl2DbManager::addRight($userGroup, 'auth.user.change.password');
         }
 
-    }
-
-    protected function getAuthConfFile() {
-        $authconfig = $this->config->getValue('auth','coordplugins');
-        return jApp::appConfigPath($authconfig);
     }
 }
