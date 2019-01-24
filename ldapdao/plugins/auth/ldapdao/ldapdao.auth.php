@@ -173,6 +173,10 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver
     {
         $dao = jDao::get($this->_params['dao'], $this->_params['profile']);
 
+        if( $this->_params['rejectEmptyPassword'] && !$password ) {
+             return false;
+        }
+
         if ($login == $this->_params['jelixAdminLogin']) {
             $user = $dao->getByLogin($login);
             return $this->checkAdminLogin($user, $dao, $password);
