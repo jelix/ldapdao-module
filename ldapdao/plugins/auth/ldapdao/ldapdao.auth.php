@@ -7,6 +7,8 @@
  * and manage user locally with a dao
  * @package    jelix
  * @subpackage auth_driver
+ *
+ * @internal see https://tools.ietf.org/html/rfc4510
  */
 class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver
 {
@@ -178,6 +180,13 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver
             return $this->checkAdminLogin($user, $dao, $password);
         }
 
+        if (trim($password) == '' || trim($login) == '') {
+            // we don't want Unauthenticated Authentication
+            // and Anonymous Authentication
+            // https://tools.ietf.org/html/rfc4513#section-5.1
+            return false;
+        }
+
         $connectAdmin = $this->_bindLdapAdminUser();
         if (!$connectAdmin) {
             return false;
@@ -323,6 +332,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver
             if ($bind) {
                 break;
             } else {
+                jLog::log('ldapdao: error when trying to connect with '.$realDn.': '.ldap_errno($connect).':'.ldap_error($connect), 'auth');
                 $this->bindUserDnTries[] = $realDn;
             }
         }
