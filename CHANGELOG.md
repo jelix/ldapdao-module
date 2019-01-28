@@ -1,8 +1,8 @@
 Changes
 =======
 
-Version 2.0.6
--------------
+Version 2.0.6 (2019-01-28)
+--------------------------
 
 - Security issue: empty password may be accepted by LDAP servers, as they 
   implement the Unauthenticated Authentication Mecanism, allowing empty password.
