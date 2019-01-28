@@ -275,8 +275,9 @@ You can also use any ldap attributes you indicate into `searchAttributes`,
 between `%%`. Example: `searchGroupFilter="(&(objectClass=posixGroup)(member=%%givenName%%))"`
 
 Warning : setting `searchGroupFilter` will remove the user from any other
-application groups that don't match the ldap group. If you don't want
-a groups synchronization, leave `searchGroupFilter` empty.
+application groups that don't match the ldap group, except default groups
+of user into the application, when `searchGroupKeepUserInDefaultGroups` is set 
+to `on`. If you don't want a groups synchronization, leave `searchGroupFilter` empty.
 
 With `searchGroupProperty`, you must indicate the ldap attribute that
 contains the group name. Ex: `searchGroupProperty="cn"`.

@@ -5,6 +5,9 @@
 /**
  * LDAP authentification driver for authentification information stored in LDAP server
  * and manage user locally with a dao
+ *
+ *
+ *
  * @package    jelix
  * @subpackage auth_driver
  *
@@ -46,6 +49,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver
             'protocolVersion'   =>  3,
             'searchUserBaseDN' => '',
             'searchGroupFilter' => '',
+            'searchGroupKeepUserInDefaultGroups' => true,
             'searchGroupProperty' => '',
             'searchGroupBaseDN' => ''
         );
@@ -247,6 +251,18 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver
 
     protected function synchronizeAclGroups($login, $userGroups)
     {
+        if ($this->_params['searchGroupKeepUserInDefaultGroups']) {
+            // Add default groups
+            $gplist = jDao::get('jacl2db~jacl2group', 'jacl2_profile')
+                ->getDefaultGroups();
+            foreach ($gplist as $group) {
+                $idx = array_search($group->name, $userGroups);
+                if ($idx === false) {
+                    $userGroups[] = $group->name;
+                }
+            }
+        }
+
         // we know the user group: we should be sure it is the same in jAcl2
         $gplist = jDao::get('jacl2db~jacl2groupsofuser', 'jacl2_profile')
             ->getGroupsUser($login);
