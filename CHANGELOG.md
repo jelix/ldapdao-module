@@ -7,7 +7,8 @@ Version 2.0.6
 - Security issue: empty password may be accepted by LDAP servers, as they 
   implement the Unauthenticated Authentication Mecanism, allowing empty password.
   We don't want such feature, so empty password are now refused. 
-
+- Fix user group search: escape parenthesis in values inserted into the 
+  searchGroupFilter name.
 
 
 Version 2.0.5 (2018-11-20)
