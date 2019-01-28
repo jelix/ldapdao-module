@@ -141,6 +141,11 @@ class ldapdao_pluginAuthTest extends jUnitTestCase {
 
     }
 
+    public function testEmptyPassword() {
+        $user1 = jAuth::verifyPassword('john', '');
+        $this->assertFalse($user1);
+    }
+
     public function testUsersList() {
         $records = jAuth::getUserList();
         $myUsersLDAP = array();

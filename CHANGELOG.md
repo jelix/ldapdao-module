@@ -1,6 +1,18 @@
 Changes
 =======
 
+Version 2.0.6 (2019-01-28)
+--------------------------
+
+- Security issue: empty password may be accepted by LDAP servers, as they 
+  implement the Unauthenticated Authentication Mecanism, allowing empty password.
+  We don't want such feature, so empty password are now refused. 
+- Fix user group search: escape parenthesis in values inserted into the 
+  searchGroupFilter name.
+- Fix user group search: add the user in default groups of the application,
+  in addition to groups corresponding to ldap groups. New configuration 
+  parameter searchGroupKeepUserInDefaultGroups to disable this feature.
+
 Version 2.0.5 (2018-11-20)
 --------------------------
 
