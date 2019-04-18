@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 2.0.7 (2019-04-18)
+--------------------------
+
+- Fix SQL error during the installation
+
+
 Version 2.0.6 (2019-01-28)
 --------------------------
 
