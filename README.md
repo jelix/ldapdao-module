@@ -8,7 +8,7 @@ Installation
 ============
 
 Configuration with Jelix 1.7
-----------------------
+----------------------------
 
 You should use Composer to install the module. Run this commands in a shell:
                                                
@@ -19,7 +19,7 @@ composer require "jelix/ldapdao-module"
 Launch the configurator for your application to enable the module
 
 ```bash
-php yourapp/cmd.php module:configure ldapdao
+php yourapp/dev.php module:configure ldapdao
 ```
 
 
@@ -29,7 +29,7 @@ Configuration with Jelix 1.6
 Copy the `ldapdao` directory into the modules/ directory of your application.
 
 Next you must say to Jelix that you want to use the module. Declare
-it into the var/config/mainconfig.ini.php file.
+it into the `var/config/mainconfig.ini.php` file.
 
 In the `[modules]` section, add:
 
@@ -71,7 +71,7 @@ This module provides two things:
 The ```ldapdao``` plugin replaces the `db` or `ldap` plugin for jAuth. The 
 installer of the module deactivates some jAcl2 rights, and copy an example 
 of the configuration file `authldap.coord.ini.php` into the configuration directory  
-(`var/config` in Jelix 1.6, `app/config` in Jelix 1.7).
+(`var/config` in Jelix 1.6, `app/system` in Jelix 1.7).
 
 You should edit the new file `authldap.coord.ini.php`. Many properties
 should be changed to match your ldap structure.

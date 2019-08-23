@@ -12,14 +12,14 @@ class ldapdaoModuleInstaller extends \Jelix\Installer\Module\Installer {
         
         // we should disable some rights
         $daoright = jDao::get('jacl2db~jacl2rights', 'jacl2_profile');
-        $daoright->deleteBySubject('auth.users.create');
-        $daoright->deleteBySubject('auth.users.change.password');
-        $daoright->deleteBySubject('auth.user.change.password');
-        //$daoright->deleteBySubject('auth.users.delete');
+        $daoright->deleteByRole('auth.users.create');
+        $daoright->deleteByRole('auth.users.change.password');
+        $daoright->deleteByRole('auth.user.change.password');
+        //$daoright->deleteByRole('auth.users.delete');
 
         // allow the admin user to change his right
         $authconfig = $helpers->getConfigIni()->getValue('auth','coordplugins');
-        $confIni = parse_ini_file(jApp::appConfigPath($authconfig), true);
+        $confIni = parse_ini_file(jApp::appSystemPath($authconfig), true);
         $authConfig = jAuth::loadConfig($confIni);
 
         if (isset($authConfig['ldapdao'])) {
