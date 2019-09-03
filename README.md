@@ -227,7 +227,7 @@ the ldap attributes of the user.
 
   For some LDAP, the DN could be a simple string, for example an email. 
   You could then set `bindUserDN="%%LOGIN%%@company.local"`. Or even 
-  `bindUserDN="%%LOGIN%%"` if the login can type the full value of
+  `bindUserDN="%%LOGIN%%"` if the user can type the full value of
   the DN or an email or else.. (Probably it's not recommended to allow
   a user to type himself its full DN, it can be a security issue)
 

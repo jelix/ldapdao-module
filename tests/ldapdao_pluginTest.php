@@ -80,7 +80,8 @@ class ldapdao_pluginAuthTest extends jUnitTestCase {
         foreach ($records as $rec) {
             $myUsersLDAP[] = $rec;
         }
-        $this->assertEquals(0, count($myUsersLDAP));
+        $this->assertEquals(1, count($myUsersLDAP));
+        $this->assertEquals('admin', $myUsersLDAP[0]->login);
         $groups = array();
         foreach(jAcl2DbUserGroup::getGroupList('john') as $group) {
             $groups[] = $group;
@@ -153,8 +154,13 @@ class ldapdao_pluginAuthTest extends jUnitTestCase {
             $myUsersLDAP[] = $rec;
         }
 
-        $this->assertEquals(2, count($myUsersLDAP));
+        $this->assertEquals(3, count($myUsersLDAP));
         $users="<array>
+            <object>
+                <string property=\"login\">admin</string>
+                <string property=\"email\">admin@localhost</string>
+                <string property=\"password\" value=\"21232f297a57a5a743894a0e4a801fc3\" />
+            </object>
             <object>
                 <string property=\"login\">john</string>
                 <string property=\"email\">john@jelix.org</string>
@@ -203,7 +209,8 @@ class ldapdao_pluginAuthTest extends jUnitTestCase {
         foreach ($records as $rec) {
             $myUsersLDAP[] = $rec;
         }
-        $this->assertEquals(0, count($myUsersLDAP));
+        $this->assertEquals(1, count($myUsersLDAP));
+        $this->assertEquals('admin', $myUsersLDAP[0]->login);
         $groups = array();
         foreach(jAcl2DbUserGroup::getGroupList('john') as $group) {
             $groups[] = $group;
