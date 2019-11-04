@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 2.0.8 (dev)
+--------------------------
+
+- Improve support of ldaps and STARTTLS, by using 
+
 Version 2.0.7 (2019-04-18)
 --------------------------
 
