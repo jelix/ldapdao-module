@@ -1,10 +1,11 @@
 Changes
 =======
 
-Version 2.0.8 (dev)
+Version 2.0.8 (2019-11-18)
 --------------------------
 
-- Improve support of ldaps and STARTTLS, by using 
+- Improve support of ldaps and STARTTLS, by using ldap uri and ldap_start_tls()
+
 
 Version 2.0.7 (2019-04-18)
 --------------------------
