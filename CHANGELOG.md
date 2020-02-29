@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 2.0.9 (2020-02-29)
+--------------------------
+
+Add more messages into logs when something wrong happens, to ease the debugging 
+of bad connections / authentication / search.
+
 Version 2.0.8 (2019-11-18)
 --------------------------
 
