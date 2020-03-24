@@ -1,6 +1,14 @@
 Changes
 =======
 
+
+Version 2.0.10 (2020-03-24)
+----------------------------
+
+remove the dependency to jauth in module.xml, as it is a conflict when
+jcommunity is installed.
+
+
 Version 2.0.9 (2020-02-29)
 --------------------------
 
