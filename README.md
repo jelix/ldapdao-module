@@ -46,9 +46,8 @@ jauth.access=2
 jauthdb.access=1
 ```
 
-If you are using the jCommunity module, you should not activate jauthdb, so keep
-`jauthdb.access=0`.
-
+If you are using the jCommunity module, you must not activate jauth and jauthdb, 
+so keep `jauth.access=0` and `jauthdb.access=0`.
 
 
 Launch the installer

@@ -1,10 +1,25 @@
 Changes
 =======
 
-Version 2.0.8 (dev)
+
+Version 2.0.10 (2020-03-24)
+----------------------------
+
+remove the dependency to jauth in module.xml, as it is a conflict when
+jcommunity is installed.
+
+
+Version 2.0.9 (2020-02-29)
 --------------------------
 
-- Improve support of ldaps and STARTTLS, by using 
+Add more messages into logs when something wrong happens, to ease the debugging 
+of bad connections / authentication / search.
+
+Version 2.0.8 (2019-11-18)
+--------------------------
+
+- Improve support of ldaps and STARTTLS, by using ldap uri and ldap_start_tls()
+
 
 Version 2.0.7 (2019-04-18)
 --------------------------

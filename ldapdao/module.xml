@@ -5,12 +5,11 @@
         <label lang="en_US">ldapdao</label>
         <description lang="en_US" />
         <license URL="http://www.mozilla.org/MPL/">Mozilla Public License</license>
-        <copyright>2014 3liz, 2017-2019 Innophi</copyright>
+        <copyright>2014 3liz, 2017-2020 Innophi</copyright>
     </info>
     <dependencies>
         <jelix minversion="1.6.19" maxversion="1.7.*"/>
         <module name="jacl2"/>
-        <module name="jauth"/>
         <choice>
             <module name="jauthdb" />
             <module name="jcommunity" />
