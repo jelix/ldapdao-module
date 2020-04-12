@@ -248,8 +248,8 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver
 
         if ($userDn === false) {
             jLog::log('ldapdao error: cannot authenticate to ldap with given bindUserDN for the login "' . $login. '". Wrong DN or password', 'auth');
-            foreach ($this->bindUserDnTries as $dn) {
-                jLog::log('ldapdao: tried to connect with bindUserDN=' . $dn, 'auth');
+            foreach ($this->bindUserDnTries as $erroMessage) {
+                jLog::log($erroMessage, 'auth');
             }
             return false;
         }
