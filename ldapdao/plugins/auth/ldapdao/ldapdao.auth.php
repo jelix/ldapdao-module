@@ -235,11 +235,13 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver
         $user = $this->createUserObject($login, '');
         $userLdapAttributes = $this->searchLdapUserAttributes($connectAdmin, $login, $user);
         if ($userLdapAttributes === false) {
+            ldap_close($connectAdmin);
             return false;
         }
 
         $connect = $this->_getLinkId();
         if (!$connect) {
+            ldap_close($connectAdmin);
             return false;
         }
         // authenticate user. let's try with all configured DN
@@ -251,6 +253,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver
             foreach ($this->bindUserDnTries as $erroMessage) {
                 jLog::log($erroMessage, 'auth');
             }
+            ldap_close($connectAdmin);
             return false;
         }
 
