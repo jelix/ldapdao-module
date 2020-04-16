@@ -2,6 +2,12 @@ Changes
 =======
 
 
+Version 2.1.1 (2020-04-16)
+---------------------------
+
+- Fix password verification: close ldap connection in case of errors
+- Fix error message when the loading of user attributes fails
+
 Version 2.1.0 (2020-03-24)
 ---------------------------
 
