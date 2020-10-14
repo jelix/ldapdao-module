@@ -23,10 +23,10 @@ trait ldapdao_plugin_trait {
         jApp::pushCurrentModule('jelix_tests');
 
         jProfiles::createVirtualProfile('ldap', $this->ldapProfileName, array(
-            'hostname'=>'localhost',
+            'hostname'=>TESTAPP_LDAP_HOST,
             'port'=> $this->ldapPort,
             'tlsMode'=> $this->ldapTlsMode,
-            'ldapUser'=>"cn=admin,dc=".TESTAPP_HOST.",dc=local",
+            'ldapUser'=>"cn=admin,dc=tests,dc=jelix",
             'ldapPassword'=>"passjelix"
         ));
 
@@ -36,12 +36,6 @@ trait ldapdao_plugin_trait {
 
         $conf = parse_ini_file(__DIR__.'/authldap.coord.ini',true);
         $conf['ldapdao']['ldapprofile'] = $this->ldapProfileName;
-        $cn = str_replace(".local", "", TESTAPP_HOST);
-        $conf['ldapdao']['searchUserBaseDN'] = str_replace('testapp16', $cn, $conf['ldapdao']['searchUserBaseDN']);
-        $conf['ldapdao']['searchGroupBaseDN'] = str_replace('testapp16', $cn, $conf['ldapdao']['searchGroupBaseDN']);
-        foreach($conf['ldapdao']['bindUserDN'] as $k => $bindUserDN) {
-            $conf['ldapdao']['bindUserDN'][$k] = str_replace('testapp16', $cn, $bindUserDN);
-        }
 
         jAuth::loadConfig($conf);
 
