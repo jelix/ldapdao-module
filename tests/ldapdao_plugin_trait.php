@@ -26,8 +26,8 @@ trait ldapdao_plugin_trait {
             'hostname'=>TESTAPP_LDAP_HOST,
             'port'=> $this->ldapPort,
             'tlsMode'=> $this->ldapTlsMode,
-            'ldapUser'=>"cn=admin,dc=tests,dc=jelix",
-            'ldapPassword'=>"passjelix"
+            'adminUserDn'=>"cn=admin,dc=tests,dc=jelix",
+            'adminPassword'=>"passjelix"
         ));
 
         $dir = __DIR__.'/../ldapdao/plugins/auth/';
