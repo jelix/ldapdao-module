@@ -14,7 +14,7 @@
     "require": {
     },
     "conflict": {
-       "jelix/jelix": ">1.7.0-alpha.1,<1.7.0-rc.5"
+       "jelix/jelix": "<1.6.21 || >1.7.0-alpha.1 <1.7.0-rc.5"
     },
     "minimum-stability": "stable",
     "extra" : {

@@ -13,7 +13,7 @@
  *
  * @internal see https://tools.ietf.org/html/rfc4510
  */
-class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver
+class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver2
 {
 
     /**
@@ -198,6 +198,14 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver
         } else {
             return $dao->findByLogin($pattern);
         }
+    }
+
+    public function canChangePassword($login)
+    {
+        if ($login == $this->_params['jelixAdminLogin']) {
+            return true;
+        }
+        return false;
     }
 
     public function changePassword($login, $newpassword)
