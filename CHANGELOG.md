@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 2.2.0 (2020-11-09)
+--------------------------
+
+- Implements jIAuthDriver2 interface available in Jelix 1.6.21+
+
 
 Version 2.1.1 (2020-04-16)
 ---------------------------
