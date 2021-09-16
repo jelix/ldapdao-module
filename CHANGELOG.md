@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 2.2.1 (2021-09-16)
+--------------------------
+
+- Fix an error during the installation
+
+
 Version 2.2.0 (2020-11-09)
 --------------------------
 

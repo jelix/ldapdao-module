@@ -59,6 +59,15 @@ In the command line, launch:
 php yourapp/install/installer.php
 ```
 
+Install other languages
+-----------------------
+
+The module is provided with english and french content. If you want
+other languages, you should retrieve them from https://download.jelix.org/jelix/langpacks/ldapdao/.
+
+Unzip the archives into `app/locales/` or `var/locales/`. 
+
+
 Configuration
 =============
 
