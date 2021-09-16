@@ -16,7 +16,7 @@ theme=default
 
 pluginsPath="app:plugins/,lib:jelix-plugins/"
 
-modulesPath="lib:jelix-modules/,app:modules/"
+modulesPath="lib:jelix-admin-modules/,lib:jelix-modules/,app:modules/,"
 
 ; default domain name to use with jfullurl for example.
 ; Let it empty to use $_SERVER['SERVER_NAME'] value instead.
@@ -31,16 +31,21 @@ domainName=
 
 jelix.access=2
 
-; jacldb is deprecated. keep it uninstall if possible. install jacl2db instead
-jacldb.access=0
-
-jacl2db.access=0
-jauth.access=0
-jauthdb.access=0
-junittests.access=0
-jsoap.access=0
-
 testapp.access=2
+jauth.access=2
+master_admin.access=2
+jauthdb.access=2
+jauthdb.installparam=defaultuser
+jauthdb_admin.access=2
+jacl2.access=2
+jacl2db.access=2
+jacl2db.installparam=defaultuser
+jacl2db_admin.access=2
+jpref.access=2
+jpref_admin.access=2
+ldapdao.access=2
+ldapdao.path="/jelixapp/ldapdao/"
+
 [coordplugins]
 ;name = file_ini_name or 1
 
@@ -106,8 +111,7 @@ simple_urlengine_https=
 ;   m~*@r    -> for all actions of the module "m" and for the request of type "r"
 ;   @r       -> for all actions for the request of type "r"
 
-index="@classic"
-
+index="@classic,jacl2db_admin~*@classic,jauthdb_admin~*@classic,master_admin~*@classic,jacl2db~*@classic,jauth~*@classic"
 
 [basic_significant_urlengine_entrypoints]
 ; for each entry point, it indicates if the entry point name
@@ -154,7 +158,7 @@ webmasterName=
 
 ; How to send mail : "mail" (mail()), "sendmail" (call sendmail), "smtp" (send directly to a smtp)
 ;                   or "file" (store the mail into a file, in filesDir directory)
-mailerType=mail
+mailerType=file
 ; Sets the hostname to use in Message-Id and Received headers
 ; and as default HELO string. If empty, the value returned
 ; by SERVER_NAME is used or 'localhost.localdomain'.
