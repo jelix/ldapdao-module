@@ -20,7 +20,7 @@ trait ldapdao_plugin_trait {
     function setUp(){
         parent::setUp();
         self::initClassicRequest(TESTAPP_URL.'index.php');
-        jApp::pushCurrentModule('jelix_tests');
+        jApp::pushCurrentModule('testapp');
 
         jProfiles::createVirtualProfile('ldap', $this->ldapProfileName, array(
             'hostname'=>TESTAPP_LDAP_HOST,
@@ -30,7 +30,7 @@ trait ldapdao_plugin_trait {
             'adminPassword'=>"passjelix"
         ));
 
-        $dir = __DIR__.'/../ldapdao/plugins/auth/';
+        $dir = __DIR__.'/../../../ldapdao/plugins/auth/';
         jApp::config()->_allBasePath[] = $dir;
         jApp::config()->_pluginsPathList_auth['ldapdao'] = $dir.'ldapdao/';
 
@@ -152,7 +152,7 @@ trait ldapdao_plugin_trait {
             <object>
                 <string property=\"login\">admin</string>
                 <string property=\"email\">admin@localhost</string>
-                <string property=\"password\" value=\"21232f297a57a5a743894a0e4a801fc3\" />
+                <string property=\"password\" value=\"d033e22ae348aeb5660fc2140aec35850c4da997\" />
             </object>
             <object>
                 <string property=\"login\">john</string>
