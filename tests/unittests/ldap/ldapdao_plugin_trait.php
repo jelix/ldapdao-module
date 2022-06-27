@@ -17,7 +17,8 @@ trait ldapdao_plugin_trait {
 
     protected $listenersBackup;
 
-    function setUp(){
+    function setUp() : void
+    {
         parent::setUp();
         self::initClassicRequest(TESTAPP_URL.'index.php');
         jApp::pushCurrentModule('testapp');
@@ -55,7 +56,8 @@ trait ldapdao_plugin_trait {
         }
     }
 
-    function tearDown(){
+    function tearDown() : void
+    {
         jApp::popCurrentModule();
         unset(jApp::coord()->plugins['auth']);
         unset($_SESSION[$this->config['session_name']]);
@@ -180,7 +182,8 @@ trait ldapdao_plugin_trait {
         $this->assertComplexIdenticalStr($user1, $userCheck);
     }
 
-    public function testUpdateUser() {
+    public function testUpdateUser()
+    {
         $myUserLDAP = jAuth::getUser("john");
         $myUserLDAP->email = "test2@jelix.org";
         jAuth::updateUser($myUserLDAP);

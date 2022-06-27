@@ -1,7 +1,5 @@
 <?php
 require_once(__DIR__.'/../testapp/application.init.php');
-require_once(LIB_PATH.'jelix-tests/classes/junittestcase.class.php');
-require_once(LIB_PATH.'jelix-tests/classes/junittestcasedb.class.php');
 
 define('TESTAPP_URL', 'http://ldapdao.local/');
 define('TESTAPP_URL_HOST', 'ldapdao.local');

@@ -14,7 +14,7 @@ require_once(__DIR__.'/ldapdao_plugin_trait.php');
  * Tests API driver LDAP/DAO for jAuth, with no encrypted communication
  * @package     ldapdao
  */
-class ldapdao_pluginAuthTest extends jUnitTestCase {
+class ldapdao_pluginAuthTest extends \Jelix\UnitTests\UnitTestCase {
     use ldapdao_plugin_trait;
 
     protected $ldapPort = 389;
