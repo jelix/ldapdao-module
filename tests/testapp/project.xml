@@ -5,18 +5,10 @@
         <label lang="en_US">testapp</label>
         <description lang="en_US"/>
         <license URL="">MIT</license>
-        <copyright>2021 Laurent Jouanneau</copyright>
-        <creator name="Laurent Jouanneau" email="laurent@jelix.org"  />
+        <copyright>2021-2022 Laurent Jouanneau</copyright>
+        <creator name="Laurent Jouanneau" email="laurent@jelix.org"/>
         <homepageURL>http://jelix.org</homepageURL>
     </info>
-    <dependencies>
-        <jelix minversion="1.6.30" maxversion="1.6.*" />
-    </dependencies>
-    <entrypoints>
-        <!-- file: the path to the entry point relative to the base path
-            config: the path to the config file used by the entry point, relative
-                    to var/config/
-            type: type of the entry point : classic, cmdline, xmlrpc....-->
-        <entry file="index.php" config="index/config.ini.php" />
-    </entrypoints>
+    
+    
 </project>

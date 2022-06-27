@@ -2,8 +2,6 @@
 ;for security reasons , don't remove or modify the first line
 ;this file doesn't list all possible properties. See lib/jelix/core/defaultconfig.ini.php for that
 
-startModule=testapp
-startAction="default:index"
 
 locale=en_US
 availableLocales=en_US
@@ -14,9 +12,7 @@ timeZone="Europe/Paris"
 
 theme=default
 
-pluginsPath="app:plugins/,lib:jelix-plugins/"
 
-modulesPath="lib:jelix-admin-modules/,lib:jelix-modules/,app:modules/,"
 
 ; default domain name to use with jfullurl for example.
 ; Let it empty to use $_SERVER['SERVER_NAME'] value instead.
@@ -24,27 +20,25 @@ domainName=
 
 
 [modules]
-; modulename.access = x where x =
-; 0 if installed but not used (database schema is ok for example)
-; 1 if accessible by other modules (other modules can use it, but it is not accessible directly through the web)
-; 2 if public (accessible through the web)
 
-jelix.access=2
 
-testapp.access=2
-jauth.access=2
-master_admin.access=2
-jauthdb.access=2
 jauthdb.installparam=defaultuser
-jauthdb_admin.access=2
-jacl2.access=2
-jacl2db.access=2
 jacl2db.installparam=defaultuser
-jacl2db_admin.access=2
-jpref.access=2
-jpref_admin.access=2
-ldapdao.access=2
 ldapdao.path="/jelixapp/ldapdao/"
+
+jelix.enabled=on
+testapp.enabled=on
+jauth.enabled=on
+master_admin.enabled=on
+jauthdb.enabled=on
+jauthdb_admin.enabled=on
+jacl2.enabled=on
+jacl2db.enabled=on
+jacl2db_admin.enabled=on
+jpref.enabled=on
+jpref_admin.enabled=on
+ldapdao.enabled=on
+jelix.installparam[wwwfiles]=vhost
 
 [coordplugins]
 ;name = file_ini_name or 1
@@ -63,8 +57,6 @@ html=myHtmlResponse
 ;force  = off
 
 [urlengine]
-; name of url engine :  "simple", "basic_significant" or "significant"
-engine=basic_significant
 
 ; this is the url path to the jelix-www content (you can found this content in lib/jelix-www/)
 ; because the jelix-www directory is outside the yourapp/www/ directory, you should create a link to
@@ -91,35 +83,7 @@ multiview=off
 ; : basePath="/aaa/" )
 basePath=
 
-defaultEntrypoint=index
-
-; action to show the 'page not found' error
-notfoundAct="jelix~error:notfound"
-
-; list of actions which require https protocol for the simple url engine
-; syntax of the list is the same as explained in the simple_urlengine_entrypoints
-simple_urlengine_https=
-
-[simple_urlengine_entrypoints]
-; parameters for the simple url engine. This is the list of entry points
-; with list of actions attached to each entry points
-
-; script_name_without_suffix = "list of action selectors separated by a space"
-; selector syntax :
-;   m~a@r    -> for the action "a" of the module "m" and for the request of type "r"
-;   m~c:*@r  -> for all actions of the controller "c" of the module "m" and for the request of type "r"
-;   m~*@r    -> for all actions of the module "m" and for the request of type "r"
-;   @r       -> for all actions for the request of type "r"
-
-index="@classic,jacl2db_admin~*@classic,jauthdb_admin~*@classic,master_admin~*@classic,jacl2db~*@classic,jauth~*@classic"
-
-[basic_significant_urlengine_entrypoints]
-; for each entry point, it indicates if the entry point name
-; should be include in the url or not
-index=on
-xmlrpc=on
-jsonrpc=on
-
+notFoundAct="jelix~error:notfound"
 [jResponseHtml]
 ; list of active plugins for jResponseHtml
 ; remove the debugbar plugin on production server, and in this case don't forget
@@ -144,9 +108,11 @@ strict=
 debug=
 sql=
 soap=
+auth=file
 
 [fileLogger]
 default=messages.log
+auth=auth.log
 
 [mailLogger]
 ;email = root@localhost
@@ -224,3 +190,6 @@ name=
 [datepickers]
 ;default = jelix/js/jforms/datepickers/default/init.js
 
+
+[session]
+storage=

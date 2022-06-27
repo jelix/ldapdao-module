@@ -8,24 +8,6 @@ export PHP_VERSION=${PHP_VERSION:-8.1}
 
 CMD=$1
 
-if [ "$CMD" == "" ]; then
-    CMD="up -d"
-fi
-
-JELIX_FILE=jelix-1.6.30-dev
-
-if [ ! -d lib/ ]; then
-  echo download and install $JELIX_FILE
-  mkdir -p temp
-  (cd temp
-  if [ ! -f $JELIX_FILE.zip ]; then
-    curl https://github.com/jelix/jelix/releases/download/RELEASE_JELIX_1_6_30/$JELIX_FILE.zip -L -O
-  fi
-  unzip -qo $JELIX_FILE.zip
-  mv $JELIX_FILE/lib ../
-  )
-fi
-
 if [ ! -f docker-conf/certs/tests.jelix-CA.crt ]; then
   echo "generate CA certs"
   (

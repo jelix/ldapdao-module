@@ -25,7 +25,7 @@ case $COMMAND in
     rights)
         docker exec -t -i ${CONTAINER_PREFIX}_php appctl.sh rights;;
     composer_install)
-        docker exec -t -i ${CONTAINER_PREFIX}_php appctl.sh composer_install;;
+        docker exec -it ${CONTAINER_PREFIX}_php appctl.sh composer_install;;
     composer_update)
         docker exec -t -i ${CONTAINER_PREFIX}_php appctl.sh composer_update;;
     unittests)
@@ -40,6 +40,10 @@ case $COMMAND in
     ldapusers)
        docker exec -it ${CONTAINER_PREFIX}_ldap /bin/ctl.sh showusers
        ;;
+    ldapshell)
+      docker exec -it ${CONTAINER_PREFIX}_ldap  /bin/bash -l
+      ;;
+
     *)
         echo "wrong command"
         exit 2

@@ -1,21 +1,19 @@
 <?php
-/**
-* @package   testapp
-* @subpackage
-* @author    your name
-* @copyright 2011 your name
-* @link      http://www.yourwebsite.undefined
-* @license    All rights reserved
-*/
-
-require (realpath(__DIR__.'/../lib/jelix/').'/'.'init.php');
+$appPath = __DIR__.'/';
+require ($appPath.'vendor/autoload.php');
 
 jApp::initPaths(
-    __DIR__.'/',
-    __DIR__.'/www/',
-    __DIR__.'/var/',
-    __DIR__.'/var/log/',
-    __DIR__.'/var/config/',
-    __DIR__.'/scripts/'
+    $appPath
+    //$appPath.'www/',
+    //$appPath.'var/',
+    //$appPath.'var/log/',
+    //$appPath.'var/config/'
 );
-jApp::setTempBasePath(realpath(__DIR__.'/../temp/').'/');
+jApp::setTempBasePath(realpath($appPath.'../temp/').'/');
+
+require ($appPath.'vendor/jelix_app_path.php');
+
+jApp::declareModulesDir(array(
+    __DIR__.'/modules/'
+));
+jApp::declareModule(__DIR__.'/../../ldapdao');

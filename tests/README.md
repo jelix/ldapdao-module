@@ -31,6 +31,6 @@ if you set `127.0.0.1 ldapdao.local` into your `/etc/hosts`.
 
 Some login/password you can use:
 
-* `admin` / `jelix` : user defined in the `var/db/users.ini.php`
+* `admin` / `admin`
 * `john` / `passjohn` : ldap user, defined in the ldap groups `group1` and `group2`
 * `jane` / `passjane` : ldap user, defined in the ldap group `group1`
