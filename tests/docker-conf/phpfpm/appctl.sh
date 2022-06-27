@@ -1,10 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 APPDIR="/jelixapp/tests/testapp"
 UNITTESTS_DIR="/jelixapp/tests/unittests"
-APP_USER=usertest
-APP_GROUP=grouptest
+APP_USER=userphp
+APP_GROUP=groupphp
 
 COMMAND="$1"
+shift
 
 if [ "$COMMAND" == "" ]; then
     echo "Error: command is missing"
@@ -29,7 +30,7 @@ function cleanTmp() {
 }
 
 
-function resetApp() {
+function cleanApp() {
     if [ -f $APPDIR/var/config/CLOSED ]; then
         rm -f $APPDIR/var/config/CLOSED
     fi
@@ -48,26 +49,41 @@ function resetApp() {
     touch $APPDIR/var/mails/.dummy && chown $APP_USER:$APP_GROUP $APPDIR/var/mails/.dummy
     touch $APPDIR/var/uploads/.dummy && chown $APP_USER:$APP_GROUP $APPDIR/var/uploads/.dummy
 
-    if [ -f $APPDIR/var/config/profiles.ini.php.dist ]; then
-        cp $APPDIR/var/config/profiles.ini.php.dist $APPDIR/var/config/profiles.ini.php
-    fi
-    if [ -f $APPDIR/var/config/localconfig.ini.php.dist ]; then
-        cp $APPDIR/var/config/localconfig.ini.php.dist $APPDIR/var/config/localconfig.ini.php
-    fi
-    chown -R $APP_USER:$APP_GROUP $APPDIR/var/config/profiles.ini.php $APPDIR/var/config/localconfig.ini.php
-
-    if [ -f $APPDIR/var/config/installer.ini.php ]; then
+    #if [ -f $APPDIR/var/config/installer.ini.php ]; then
         rm -f $APPDIR/var/config/installer.ini.php
+    #fi
+    if [ -f $APPDIR/var/config/installer.bak.ini.php ]; then
+        rm -f $APPDIR/var/config/installer.bak.ini.php
     fi
     if [ -f $APPDIR/var/config/liveconfig.ini.php ]; then
         rm -f $APPDIR/var/config/liveconfig.ini.php
     fi
 
+    if [ -f $APPDIR/var/config/localconfig.ini.php ]; then
+        rm -f $APPDIR/var/config/localconfig.ini.php
+    fi
+
+    if [ -f $APPDIR/var/config/profiles.ini.php ]; then
+        rm -f $APPDIR/var/config/profiles.ini.php
+    fi
+
     cleanTmp
-    setRights
-    launchInstaller
+
 }
 
+function resetApp() {
+  cleanApp
+
+  if [ -f $APPDIR/var/config/profiles.ini.php.dist ]; then
+      cp $APPDIR/var/config/profiles.ini.php.dist $APPDIR/var/config/profiles.ini.php
+  fi
+  if [ -f $APPDIR/var/config/localconfig.ini.php.dist ]; then
+      cp $APPDIR/var/config/localconfig.ini.php.dist $APPDIR/var/config/localconfig.ini.php
+  fi
+  chown -R $APP_USER:$APP_GROUP $APPDIR/var/config/profiles.ini.php $APPDIR/var/config/localconfig.ini.php
+
+  setRights
+}
 
 function launchInstaller() {
     su $APP_USER -c "php $APPDIR/install/installer.php"
@@ -139,16 +155,15 @@ function launch() {
     cleanTmp
 }
 
-function launchUnitTests() {
-    su $APP_USER -c "cd $APPDIR/../unittests/ && vendor/bin/phpunit"
-}
-
-
 case $COMMAND in
     clean_tmp)
         cleanTmp;;
+    clean)
+        cleanApp;;
     reset)
-        resetApp;;
+          cleanApp
+          launchInstaller
+          ;;
     launch)
         launch;;
     install)
@@ -160,7 +175,9 @@ case $COMMAND in
     composer_update)
         composerUpdate;;
     unittests)
-        launchUnitTests;;
+        UTCMD="cd $UNITTESTS_DIR/ && ./vendor/bin/phpunit  $@"
+        su $APP_USER -c "$UTCMD"
+        ;;
     *)
         echo "wrong command"
         exit 2

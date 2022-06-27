@@ -97,7 +97,7 @@ function genCert() {
     echo "CSR of the cert for the $CERT_DOMAIN created"
     echo ""
 
-    # Generate the certificate using the testapp.local csr and key along with the CA Root key
+    # Generate the certificate using the csr and key along with the CA Root key
     openssl x509 -req -in $EXPORT_DIR/$CERT_FILE_BASE_NAME.csr \
       -CA $EXPORT_DIR/$CA_CERT_FILE_BASE_NAME.crt \
       -CAkey $EXPORT_DIR/$CA_CERT_FILE_BASE_NAME.key \

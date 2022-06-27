@@ -19,13 +19,14 @@ services:
     build:
       context: ./docker-conf/phpfpm
       args:
-        user_id: ${FPM_USER_ID}
-        group_id: ${FPM_GROUP_ID}
+        PHP_VERSION: "${PHP_VERSION}"
     container_name: jelix_ldapdao_php
     environment:
       TLS_CA_CRT_FILENAME: "tests.jelix-CA.crt"
       TESTAPP_WEB_PORT: "${TESTAPP_WEB_PORT}"
-      PHP_VERSION: "${PHP_VERSION}"
+      APP_USER_ID: ${FPM_USER_ID}
+      APP_GROUP_ID: ${FPM_GROUP_ID}
+      DISPLAY_ERRORS: "on"
     volumes:
       - "../:/jelixapp/"
       - "./docker-conf/certs:/customcerts"

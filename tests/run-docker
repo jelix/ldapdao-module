@@ -4,6 +4,7 @@ set -e
 
 export FPM_USER_ID=${FPM_USER_ID:-$(id -u)}
 export FPM_GROUP_ID=${FPM_GROUP_ID:-$(id -g)}
+export PHP_VERSION=${PHP_VERSION:-8.1}
 
 CMD=$1
 
@@ -46,8 +47,14 @@ if [ "$TESTAPP_WEB_PORT" == "" ]; then
   export TESTAPP_WEB_PORT=8817
 fi
 
-if [ "$PHP_VERSION" == "" ]; then
-  export PHP_VERSION=7.4
+if [ "$CMD" == "reset" ]; then
+    # Stop/Remove containers
+    docker compose -p jelix-ldapdao-tests rm -sf || true
+    exit 0
+elif [ -z "$CMD" ]; then
+    CMD="up"
+else
+    shift
 fi
 
-docker-compose -p jelix-ldapdao-tests $CMD
+docker compose -p jelix-ldapdao-tests $CMD
