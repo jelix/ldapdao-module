@@ -15,6 +15,10 @@ services:
     volumes:
       - "./docker-conf/certs:/customcerts"
       - "./docker-conf/openldap/ldif:/customldif"
+    networks:
+      default:
+        aliases:
+          - ldap.jelix
   php:
     build:
       context: ./docker-conf/phpfpm
@@ -46,4 +50,5 @@ services:
     networks:
       default:
         aliases:
-          - testapp.local
+          - ldapdao.local
+          - tests.jelix
