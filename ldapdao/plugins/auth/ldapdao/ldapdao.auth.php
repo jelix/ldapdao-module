@@ -531,7 +531,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver2
 
             if ($this->_params['tlsMode'] == 'starttls') {
                 if (!@ldap_start_tls($connect)) {
-                    $this->logLdapError($connect, 'connection error: impossible to start TLS connection');
+                    $this->logLdapError($connect, 'connection error: impossible to start TLS connection to '.$this->uriConnect);
                     return false;
                 }
             }

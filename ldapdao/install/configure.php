@@ -23,6 +23,7 @@ class ldapdaoModuleConfigurator extends \Jelix\Installer\Module\Configurator {
 
         if (!$this->getParameter('noconfigfile')) {
             $helpers->copyFile('authldap.coord.ini.php', 'config:authldap.coord.ini.php', false);
+            $helpers->getConfigIni()->setValue('auth', 'authldap.coord.ini.php', 'coordplugins');
         }
     }
 
