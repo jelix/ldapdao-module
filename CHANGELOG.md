@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 2.2.2 (2022-06-28)
+--------------------------
+
+- Fix the ldapdao installer for Jelix 1.7+
+
 Version 2.2.1 (2021-09-16)
 --------------------------
 
