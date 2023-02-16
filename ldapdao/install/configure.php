@@ -17,9 +17,9 @@ class ldapdaoModuleConfigurator extends \Jelix\Installer\Module\Configurator {
 
     public function configure(ConfigurationHelpers $helpers) {
 
-        $this->parameters['noconfigfile'] = $helpers->cli()
+        /*$this->parameters['noconfigfile'] = $helpers->cli()
             ->askConfirmation('Do you want to create authldap.coord.ini.php?',
-                $this->parameters['noconfigfile']);
+                $this->parameters['noconfigfile']);*/
 
         if (!$this->getParameter('noconfigfile')) {
             $helpers->copyFile('authldap.coord.ini.php', 'config:authldap.coord.ini.php', false);
