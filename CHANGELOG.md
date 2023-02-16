@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 2.2.3 (2023-02-17)
+--------------------------
+
+- no interactive configuration, it is useless
+
 Version 2.2.2 (2022-06-28)
 --------------------------
 
