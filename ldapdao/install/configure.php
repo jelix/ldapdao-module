@@ -25,6 +25,8 @@ class ldapdaoModuleConfigurator extends \Jelix\Installer\Module\Configurator {
             $helpers->copyFile('authldap.coord.ini.php', 'config:authldap.coord.ini.php', false);
             $helpers->getConfigIni()->setValue('auth', 'authldap.coord.ini.php', 'coordplugins');
         }
+
+        $helpers->getConfigIni()->setValue('driver', 'ldapdao', 'coordplugin_auth');
     }
 
     public function localConfigure(\Jelix\Installer\Module\API\LocalConfigurationHelpers $helpers) {

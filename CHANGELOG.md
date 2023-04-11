@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 2.2.4 (2023-04-11)
+--------------------------
+
+Installer: set automatically the jAuth driver value, even in "noconfigfile" mode.
+
 Version 2.2.3 (2023-02-17)
 --------------------------
 
