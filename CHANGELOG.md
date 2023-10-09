@@ -1,7 +1,7 @@
 Changes
 =======
 
-Version 2.2.5 ()
+Version 2.2.5 (2023-10-09)
 -------------------------
 
 - Adds the `getDao()` method on the authentication plugin for applications that are using Jelix 1.8.3.
