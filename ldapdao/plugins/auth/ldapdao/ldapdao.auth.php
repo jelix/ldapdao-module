@@ -131,6 +131,14 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver2
         }
     }
 
+    /**
+     * @return jDaoFactoryBase
+     */
+    public function getDao()
+    {
+        return jDao::get($this->_params['dao'], $this->_params['profile']);
+    }
+
     public function saveNewUser($user)
     {
         throw new jException("ldapdao~errors.unsupported.user.creation");
@@ -138,8 +146,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver2
 
     public function removeUser($login)
     {
-        $dao = jDao::get($this->_params['dao'], $this->_params['profile']);
-        $dao->deleteByLogin($login);
+        $this->getDao()->deleteByLogin($login);
         return true;
     }
 
@@ -153,14 +160,13 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver2
             throw new jException('ldapdao~errors.user.login.unset');
         }
 
-        $dao = jDao::get($this->_params['dao'], $this->_params['profile']);
-        $dao->update($user);
+        $this->getDao()->update($user);
         return true;
     }
 
     public function getUser($login)
     {
-        $dao = jDao::get($this->_params['dao'], $this->_params['profile']);
+        $dao = $this->getDao();
         $user = $dao->getByLogin($login);
         if ($user) {
             return $user;
@@ -192,7 +198,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver2
 
     public function getUserList($pattern)
     {
-        $dao = jDao::get($this->_params['dao'], $this->_params['profile']);
+        $dao = $this->getDao();
         if ($pattern == '%' || $pattern == '') {
             return $dao->findAll();
         } else {
@@ -211,8 +217,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver2
     public function changePassword($login, $newpassword)
     {
         if ($login == $this->_params['jelixAdminLogin']) {
-            $dao = jDao::get($this->_params['dao'], $this->_params['profile']);
-            return $dao->updatePassword($login, $this->cryptPassword($newpassword));
+            return $this->getDao()->updatePassword($login, $this->cryptPassword($newpassword));
         }
 
         throw new jException('ldapdao~errors.unsupported.password.change');
@@ -220,7 +225,7 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver2
 
     public function verifyPassword($login, $password)
     {
-        $dao = jDao::get($this->_params['dao'], $this->_params['profile']);
+        $dao = $this->getDao();
 
         if ($login == $this->_params['jelixAdminLogin']) {
             $user = $dao->getByLogin($login);
@@ -584,5 +589,4 @@ class ldapdaoAuthDriver extends jAuthDriverBase implements jIAuthDriver2
     {
         jLog::log($this->getLdapError($connect, $contextMessage), 'auth');
     }
-
 }
