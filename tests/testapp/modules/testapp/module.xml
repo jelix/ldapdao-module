@@ -5,11 +5,11 @@
         <label lang="en_US">testapp</label>
         <description lang="en_US" />
         <license URL="">MIT</license>
-        <copyright>2021 Laurent Jouanneau</copyright>
+        <copyright>2021-2025 Laurent Jouanneau</copyright>
         <creator name="Laurent Jouanneau" email="laurent@jelix.org"  />
         <homepageURL>http://jelix.org</homepageURL>
     </info>
     <dependencies>
-        <jelix minversion="1.6.30" maxversion="1.6.*"/>
+        <jelix minversion="1.6.30" maxversion="1.8.*"/>
     </dependencies>
 </module>
